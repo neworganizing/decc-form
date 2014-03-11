@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Submit DECC Order{% endblock %}
+{% block content %}
+<form action="" method="POST">
+  {% for field in form %}
+  <p>{{field.label}}: {{ field }}</p>
+  {% endfor %}
+  <button type="submit">Upload PDFs&raquo</button>
+</form>
+{% endblock %}

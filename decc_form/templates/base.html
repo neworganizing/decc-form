@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{% block title %}{% endblock%}</title>
+  </head>
+  <body>
+    {% if messages %}
+    <ul class="messgaes">
+      {% for message in messages %}
+      <li id="message_{{forloop.counter {}"
+	  {% if message.tags %} class="{{ message.tag }}"
+	  {% endif %}>
+	{{message}}
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </body>
+</html>
