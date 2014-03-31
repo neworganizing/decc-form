@@ -1,4 +1,6 @@
 from django.db import models
+from django.conf import settings 
+import datetime
 
 class Address(models.Model):
     street1 = models.CharField(max_length=255)
@@ -7,41 +9,33 @@ class Address(models.Model):
     state = models.CharField(max_length=255)
     zipcode = models.CharField(max_length=32)
 
-    def __str__(self):
+    def __unicode__(self):
         return str(self.street1 + self.city +','+self.state)
 
+
 class Contact(models.Model):
-    name = models.CharField(max_length=255)
-    email = models.CharField(max_length=255)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL)
+    #in user
+    #name = models.CharField(max_length=255)
+    #email = models.CharField(max_length=255)
     work_phone = models.CharField(max_length=255)
     cell_phone = models.CharField(max_length=255)
     fax = models.CharField(max_length=255)
     added_date = models.DateField()
     modified_date = models.DateField()
 
-class Client(models.Model):
-    org_name = models.CharField(max_length=255)
-    added_date = models.DateTimeField()
-    modified_date = models.DateTimeField()
-    address_id = models.ForeignKey(Address)
-    contacts = models.ManyToManyField(Contact, through='ClientContact')
-    
-    def __str__(self):
-        return str(self.org_name)
-
-class ClientContact(models.Model):
-    client_id = models.ForeignKey(Client)
-    contact_id = models.ForeignKey(Contact)
-    order = models.IntegerField()
 
 class Billable(models.Model):
+    contact_id = models.ForeignKey(Contact)
+    address_id = models.ForeignKey(Address)
     tax_status = models.CharField(max_length=255)
     added_date = models.DateField()
     modified_date = models.DateField()
-    contact_id = models.ForeignKey(Contact)
-    address_id = models.ForeignKey(Address)
 
+   
 class Project(models.Model):
+    #client_id = models.ForeignKey(Client)
+    billable_id = models.ForeignKey(Billable)
     start_date = models.DateField()
     end_date = models.DateField()
     order_frequency = models.IntegerField()
@@ -49,40 +43,68 @@ class Project(models.Model):
     notes = models.TextField()
     added_date = models.DateField()
     modified_date = models.DateField()
+   
+class Client(models.Model):
+    address_id = models.ForeignKey(Address)
+    project_id = models.ForeignKey(Project)
+    contacts = models.ManyToManyField(Contact, through='ClientContact')
+    org_name = models.CharField(max_length=255)
+    added_date = models.DateTimeField()
+    modified_date = models.DateTimeField()
+       
+    def __unicode__(self):
+        return str(self.org_name)
+
+
+class ClientContact(models.Model):
     client_id = models.ForeignKey(Client)
-    billable_id = models.ForeignKey(Billable)
+    contact_id = models.ForeignKey(Contact)
+    order = models.IntegerField()
+
 
 class Type(models.Model):
+    project_id = models.ForeignKey(Project)
     type_name = models.CharField(max_length=255)
     field_notes = models.TextField()
-    project_id = models.ForeignKey(Project)
     cost_rate = models.DecimalField(max_digits=4, decimal_places=2)
     cost_noi = models.DecimalField(max_digits=5, decimal_places=3)
 
+
 class Order(models.Model):
-    order_date = models.DateField()
-    bill_date = models.DateField()
-    paid_date = models.DateField()
     project_id = models.ForeignKey(Project)
+    order_date = models.DateField(default=datetime.datetime.today())
+    bill_date = models.DateField(null=True, blank=True)
+    paid_date = models.DateField(null=True, blank=True)
+    
 
 class Part(models.Model):
+    order_id = models.ForeignKey(Order)
+    type_id = models.ForeignKey(Type)
     rush = models.BooleanField()
     state = models.CharField(max_length=2)
     item_count = models.IntegerField()
     batch_count = models.IntegerField()
     extras = models.CharField(max_length=255)
-    order_id = models.ForeignKey(Order)
-    type_id = models.ForeignKey(Type)
 
+    
 class Batch(models.Model):
     #NEEDS SPECIAL PRIMARY KEY
+    #id = models.PositiveIntegerField(primary_key=True)
+    part_id = models.ForeignKey(Part) 
     client_filename = models.CharField(max_length=255)
-    vendor_filename = models.CharField(max_length=255)
+    #vendor_filename = models.CharField(max_length=255)
     item_count = models.IntegerField()
     submission_date = models.DateField()
     processed_date = models.DateField()
     return_date = models.DateField()
-    part_id = models.ForeignKey(Part)
+
+    #append .pdf to primary key to return vendor_filename
+    def get_vendor_filename(self):
+        return str(self.id + '.pdf')
+        
+    def save(self, *args, **kwargs):
+        pass
+
 
 class Registrant(models.Model):
     batch_id = models.ForeignKey(Batch)
@@ -111,6 +133,7 @@ class Registrant(models.Model):
     bad_image = models.CharField(max_length=32)
     error_code = models.IntegerField()
     addresses = models.ManyToManyField(Address, through='RegistrantAddress')
+
 
 class RegistrantAddress(models.Model):
     ADDR_TYPE_CHOICES = (

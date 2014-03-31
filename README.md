@@ -1,0 +1,1 @@
+Change decc_form/decc_form/sample_db_config.py to db_config.py and add your values to the variables.
