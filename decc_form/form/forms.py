@@ -1,20 +1,50 @@
 from django import forms
-from django.contrib.localflavor import US
-from models import Type
+from localflavor.us.us_states import STATE_CHOICES
+from localflavor.us.forms import USStateField
+from models import Type, Client
+
+
+class ClientSelectionForm(forms.Form):
+    client = forms.ModelChoiceField(queryset=Client.objects.all())
+
+    def __init__(self, *args, **kwargs):
+        queryset = Client.objects.all()
+        if 'user' in kwargs:
+            queryset = kwargs['user'].contact.client_set.all()
+            del kwargs['user']
+
+        super(ClientSelectionForm, self).__init__(*args, **kwargs)
+        self.fields['client'].queryset = queryset
 
 #class PartForm(forms.ModelForm):
 class PartForm(forms.Form):
-    state = forms.USStateField() #forms.CharField(max_length=255) #eventual choice drop down
-    form_type = forms.ModelChoiceField(queryset=Type.objects.filter(project_id=self.project_id))#forms.CharField(max_length=255) #eventual fill w/user specific options
+    state = USStateField(widget=forms.Select(choices=(('', 'Select a State'),)+STATE_CHOICES)) 
+    form_type = forms.ModelChoiceField(queryset=Type.objects.all())  
     num_items = forms.IntegerField()
     num_batches = forms.IntegerField()
     
     def __init__(self, *args, **kwargs):
-        self.project_id = kwargs['project_id']
-        del kwargs['project_id']
+        self.project_id = kwargs.pop('project_id', None)
+        #del kwargs['project_id']
         super(PartForm, self).__init__(*args, **kwargs)
+        if self.project_id:
+            self.fields['form_type'].queryset = Type.objects.filter(project_id=self.project_id)
 
 
+"""
+#StackOverflow sample
+class AccountDetailsForm(forms.Form):
+    
+    adminuser = forms.ModelChoiceField(queryset=User.objects.all())
+    def __init__(self, *args, **kwargs):
+        accountid = kwargs.pop('accountid', None)
+        super(AccountDetailsForm, self).__init__(*args, **kwargs)
+
+        if accountid:
+            self.fields['adminuser'].queryset = User.objects.filter(account=accountid)
+
+form = AccountDetailsForm(accountid=3)
+"""
 """
 #IN VIEWS. NOT FORMS. 
 def get(self, request, *args, **kwargs):

@@ -1,10 +1,11 @@
 from django.contrib import messages
 from django.views.generic import TemplateView, CreateView, DetailView
+from django.http import HttpResponseRedirect, Http404
 
 #from braces.views import LoginRequiredMixin
 
-from .models import Part, Order
-
+from .models import Order, Part, Client
+from .forms import ClientSelectionForm, PartForm
 import datetime as dt
 
 class IndexView(TemplateView):
@@ -21,41 +22,57 @@ class OrderCreateView(CreateView):
 class OrderView(TemplateView):
     #template_name = 'order_form.html'
 
-            
+    def get(self, request, *args, **kwargs):
+        context = super(OrderView, self).get_context_data(*args, **kwargs)
+        context['form'] = ClientSelectionForm(user=request.user)
+        return self.render_to_response(context)
+
     def post(self, request, *args, **kwargs):
         context = super(OrderView, self).get_context_data(*args, **kwargs)
+        context['form'] = ClientSelectionForm(request.POST)
+        
+        if context['form'].is_valid():
+            client = context['form'].cleaned_data['client']
 
-        default_order_data = {
-            'project_id': request.user.project_id,
+            if client:
+                project_id = client.project_id
+        else:
+            return self.render_to_response(context)
+
+        order_data = {
+            'project_id': project_id,
             'order_date': dt.datetime.today()
         }
 
-        form = get_form(request.POST, initial=default_order_data)
-
-        if form.is_valid():
-            order = form.save()
-            #TODO: add specific order_id to url
-            return HttpResponsRedirect('/order/{0}/part/'.format(order_id))
-        #else: 
+        order = Order(**order_data)
+        order.save()
+        return HttpResponseRedirect('/order/{0}/part/'.format(order.id))
 
 class PartView(TemplateView):
+    form_class = PartForm
 
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(*args, **kwargs)
-        project_id = request.GET.get('project_id', None)
+
+        try:
+            order = Order.objects.get(pk=kwargs['order_id'])
+        except Order.DoesNotExist:
+            raise Http404
         
-        if not project_id:
-            pass
-            
-        form = OrderForm(project_id=project_id)
+        form = PartForm(project_id=order.project_id)
         context['form'] = form
-        self.render_to_response(context)
+        return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
-        
+        context = self.get_context_data(*args, **kwargs)
 
         if form.is_valid():
             part = form.save()
+            #TODO: figure out order_id save situation 
+            #return HttpResponseRedirect('/order/{0}/part{1}/'.format(order_id, part_id))
+            return HttpResponseRedirect('/order/X/part{1}/'.format(part_id))
+        else:
+            return self.render_to_response(context)
 
 """
 #Experiment with CBVs gone horribly wrong
