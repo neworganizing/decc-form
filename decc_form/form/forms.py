@@ -1,5 +1,5 @@
 from django import forms
-from localflavor.us.us_states import STATE_CHOICES
+from localflavor.us.us_states import US_STATES, STATE_CHOICES
 from localflavor.us.forms import USStateField
 from models import Type, Client
 
@@ -18,7 +18,7 @@ class ClientSelectionForm(forms.Form):
 
 #class PartForm(forms.ModelForm):
 class PartForm(forms.Form):
-    state = USStateField(widget=forms.Select(choices=(('', 'Select a State'),)+STATE_CHOICES)) 
+    state = USStateField(widget=forms.Select(choices=(('', 'Select a State'),)+US_STATES))
     form_type = forms.ModelChoiceField(queryset=Type.objects.all())  
     num_items = forms.IntegerField()
     num_batches = forms.IntegerField()
@@ -30,6 +30,12 @@ class PartForm(forms.Form):
         if self.project_id:
             self.fields['form_type'].queryset = Type.objects.filter(project_id=self.project_id)
 
+class BatchUploadForm(forms.Form):
+    #some logic to get associated Part ID
+    #dt now 
+    item_count = forms.IntegerField()
+    batch_file = forms.FileField()
+    
 
 """
 #StackOverflow sample
