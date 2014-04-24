@@ -12,14 +12,10 @@ import datetime as dt
 class IndexView(TemplateView):
     template_name = 'index.html'
 
+
 class ThanksView(TemplateView):
     template_name = 'thanks.html'
-"""
-#first arg: LoginRequiredMixin
-class OrderCreateView(CreateView):
-    model = Order
-    success_msg = 'Order successfully started'
-"""
+
 
 #first arg: LoginRequiredMixin
 class OrderView(TemplateView):
@@ -48,6 +44,7 @@ class OrderView(TemplateView):
         order = Order(**order_data)
         order.save()
         return HttpResponseRedirect('/order/{0}/part/'.format(order.id))
+
 
 class PartView(TemplateView):
     form_class = PartForm
@@ -80,6 +77,7 @@ class PartView(TemplateView):
             return HttpResponseRedirect('/order/{0}/part/{1}/batch/'.format(part.order.id, part.id))
         else:
             return self.render_to_response(context)
+
 
 class BatchView(TemplateView):
     
