@@ -23,7 +23,6 @@ class OrderCreateView(CreateView):
 
 #first arg: LoginRequiredMixin
 class OrderView(TemplateView):
-    #template_name = 'order_form.html'
 
     def get(self, request, *args, **kwargs):
         context = super(OrderView, self).get_context_data(*args, **kwargs)
@@ -36,7 +35,6 @@ class OrderView(TemplateView):
         
         if context['form'].is_valid():
             client = context['form'].cleaned_data['client']
-
             if client:
                 project_id = client.project_id
         else:
@@ -88,9 +86,9 @@ class BatchView(TemplateView):
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(*args, **kwargs)
         form = BatchUploadForm(initial={'part': kwargs['part_id']})
-                                    #'submission_date': dt.datetime.today()})
         context['form'] = form
         return self.render_to_response(context)
+        
     """
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(*args, **kwargs)
@@ -100,11 +98,12 @@ class BatchView(TemplateView):
         context['form'] = form
         return self.render_to_response(context)
     """
+
     def post(self, request, *args, **kwargs):
         context = super(BatchView, self).get_context_data(*args, **kwargs)
         form = BatchUploadForm(request.POST, request.FILES)
         context['form'] = form
-        print form.is_bound
+    
         if form.is_valid():
             part = Part.objects.get(pk=request.POST.get('part'))
             client_filename = request.FILES['client_filename']
@@ -113,21 +112,5 @@ class BatchView(TemplateView):
             batch.save()
             return HttpResponseRedirect('/thanks/')
         else:
-            print form.errors
-            print 'NOT VALID'
             return self.render_to_response(context)
-    """
-    def post(self, request, *args, **kwargs):
-        context = super(BatchView, self).get_context_data(*args, **kwargs)
-        form = BatchUploadForm(request.POST, request.FILES)
-        context['form'] = form
-        print form.is_bound
-        if form.is_valid():
-            form['part'] = Part.objects.get(pk=request.POST.get('part'))
-            form.save()
-            return HttpResponseRedirect('/thanks/')
-        else:
-            print form.errors
-            print 'NOT VALID'
-            return self.render_to_response(context)
-    """
+    

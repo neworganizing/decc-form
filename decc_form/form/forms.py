@@ -16,16 +16,16 @@ class ClientSelectionForm(forms.Form):
         super(ClientSelectionForm, self).__init__(*args, **kwargs)
         self.fields['client'].queryset = queryset
 
-#class PartForm(forms.ModelForm):
+
 class PartForm(forms.Form):
     state = USStateField(widget=forms.Select(choices=(('', 'Select a State'),)+US_STATES))
     form_type = forms.ModelChoiceField(queryset=Type.objects.all())  
     num_items = forms.IntegerField()
     num_batches = forms.IntegerField()
     rush = forms.BooleanField(label='Check this box if your order must be rushed')
+
     def __init__(self, *args, **kwargs):
         self.project_id = kwargs.pop('project_id', None)
-        #del kwargs['project_id']
         super(PartForm, self).__init__(*args, **kwargs)
         if self.project_id:
             self.fields['form_type'].queryset = Type.objects.filter(project_id=self.project_id)
@@ -35,50 +35,3 @@ class BatchUploadForm(forms.Form):
     part = forms.IntegerField(widget=forms.HiddenInput())
     item_count = forms.IntegerField(required=True)
     client_filename = forms.FileField(required=True)
-    
-    def __init__(self, *args, **kwargs):
-        self.part_id = kwargs.pop('part', None)
-        super(BatchUploadForm, self).__init__(*args, **kwargs)
-        if self.part_id:
-            self.fields['part'] = Part.objects.get(pk=self.part_id)
-    
-    
-"""
-class BatchUploadForm(forms.ModelForm):
-    part = forms.ModelChoiceField(widget=forms.HiddenInput())
-    #submission_date = forms.DateField(widget=forms.HiddenInput())
-    class Meta:
-        model = Batch
-        fields = ['part','item_count', 'client_filename']
-        #fields = ['part', 'submission_date', 'item_count', 'client_filename']
-"""
-
-
-
-"""
-#StackOverflow sample
-class AccountDetailsForm(forms.Form):
-    
-    adminuser = forms.ModelChoiceField(queryset=User.objects.all())
-    def __init__(self, *args, **kwargs):
-        accountid = kwargs.pop('accountid', None)
-        super(AccountDetailsForm, self).__init__(*args, **kwargs)
-
-        if accountid:
-            self.fields['adminuser'].queryset = User.objects.filter(account=accountid)
-
-form = AccountDetailsForm(accountid=3)
-"""
-"""
-#IN VIEWS. NOT FORMS. 
-def get(self, request, *args, **kwargs):
-    context = self.get_context_data(*args, **kwargs)
-    proejct_id = request.GET.get('project_id', None)
-
-    if not project_id:
-        pass
-
-    form = OrderForm(project_id=project_id)
-    context['form'] = form
-    self.render_to_response(context)
-"""
