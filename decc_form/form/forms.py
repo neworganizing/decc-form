@@ -1,7 +1,8 @@
 from django import forms
 from localflavor.us.us_states import US_STATES, STATE_CHOICES
 from localflavor.us.forms import USStateField
-from models import Type, Client, Batch
+from models import Type, Client
+
 
 
 class ClientSelectionForm(forms.Form):
@@ -22,7 +23,7 @@ class PartForm(forms.Form):
     form_type = forms.ModelChoiceField(queryset=Type.objects.all())  
     num_items = forms.IntegerField()
     num_batches = forms.IntegerField()
-    rush = forms.BooleanField(label='Check this box if your order must be rushed')
+    rush = forms.BooleanField(label='Check this box if your order must be rushed', required=False)
 
     def __init__(self, *args, **kwargs):
         self.project_id = kwargs.pop('project_id', None)
@@ -35,3 +36,4 @@ class BatchUploadForm(forms.Form):
     part = forms.IntegerField(widget=forms.HiddenInput())
     item_count = forms.IntegerField(required=True)
     client_filename = forms.FileField(required=True)
+

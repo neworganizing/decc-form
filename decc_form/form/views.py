@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.views.generic import TemplateView, CreateView, DetailView
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response
-
+from django.forms.formsets import formset_factory
 #from braces.views import LoginRequiredMixin
 
 from .models import Order, Part, Client, Type, Batch
@@ -71,43 +71,44 @@ class PartView(TemplateView):
             form_type = Type.objects.get(pk=request.POST.get('form_type'))
             item_count = request.POST.get('num_items')
             batch_count = request.POST.get('num_batches')
-            rush = request.POST.get('rush')
+            rush = request.POST.get('rush', False)
             part = Part(order=order, state=state, form_type=form_type, item_count=item_count, batch_count=batch_count, rush=rush)
             part.save()
             return HttpResponseRedirect('/order/{0}/part/{1}/batch/'.format(part.order.id, part.id))
         else:
+            print form.errors
+
             return self.render_to_response(context)
 
 
 class BatchView(TemplateView):
-    
+   
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(*args, **kwargs)
-        form = BatchUploadForm(initial={'part': kwargs['part_id']})
-        context['form'] = form
+        items = Part.objects.get(pk=kwargs['part_id']).batch_count 
+        print 'items: {}'.format(items)
+        BatchUploadFormSet = formset_factory(BatchUploadForm, extra=0)
+        initial = []
+        for i in range(items):
+            initial.append({'part': kwargs['part_id']})
+        formset  = BatchUploadFormSet(initial=initial)
+        context['formset'] = formset
         return self.render_to_response(context)
-        
-    """
-    def get(self, request, *args, **kwargs):
-        context = self.get_context_data(*args, **kwargs)
-        #form = BatchUploadForm(initial={'part': kwargs['part_id'], 'submission_date': dt.datetime.today()})
-        
-        batch_form = formset_factory(BatchUploadForm, extra = 
-        context['form'] = form
-        return self.render_to_response(context)
-    """
 
     def post(self, request, *args, **kwargs):
         context = super(BatchView, self).get_context_data(*args, **kwargs)
-        form = BatchUploadForm(request.POST, request.FILES)
-        context['form'] = form
-    
-        if form.is_valid():
-            part = Part.objects.get(pk=request.POST.get('part'))
-            client_filename = request.FILES['client_filename']
-            item_count = request.POST.get('item_count')
-            batch = Batch(part=part, client_filename=client_filename, item_count=item_count)
-            batch.save()
+        BatchUploadFormSet = formset_factory(BatchUploadForm, extra=0)
+        formset = BatchUploadFormSet(request.POST, request.FILES)
+        context['formset'] = formset
+        
+        if formset.is_valid():
+            for form in formset:
+                print 'form'
+                part = Part.objects.get(pk=form.cleaned_data['part'])
+                client_filename = form.cleaned_data['client_filename']
+                item_count = form.cleaned_data['item_count']
+                batch = Batch(part=part, client_filename=client_filename, item_count=item_count)
+                batch.save()
             return HttpResponseRedirect('/thanks/')
         else:
             return self.render_to_response(context)

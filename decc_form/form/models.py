@@ -105,9 +105,11 @@ class Batch(models.Model):
         if not self.pk:
             proj_id = self.part.order.project.id
             c_id = str(Client.objects.get(project=proj_id).id)
+            print 'c_id: {}'.format(c_id)
             while len(c_id) < 3:
                 c_id = '0' + c_id
             try:
+                print str(Batch.objects.filter(id__startswith=int(c_id)).order_by('-id')[0].id)
                 b_id = str(Batch.objects.filter(id__startswith=int(c_id)).order_by('-id')[0].id + 1)[-7:] 
             except (Batch.DoesNotExist, IndexError) as e:
                 b_id = str(1)
