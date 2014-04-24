@@ -87,26 +87,48 @@ class Part(models.Model):
     state = models.CharField(max_length=2)
     item_count = models.IntegerField()
     batch_count = models.IntegerField()
-    extras = models.CharField(max_length=255, null=True, blank=True)
+    extras = models.CharField(max_length=255)
 
     
 class Batch(models.Model):
-    #NEEDS SPECIAL PRIMARY KEY
-    #id = models.PositiveIntegerField(primary_key=True)
+    #PK = 3 digit client_id, 7 digit batch_id, based on last batch from that project
+    id = models.PositiveIntegerField(primary_key=True)
     part = models.ForeignKey(Part) 
-    client_filename = models.CharField(max_length=255)
-    #vendor_filename = models.CharField(max_length=255)
+    client_filename = models.FileField(upload_to='batchfiles/')
+    vendor_filename = models.CharField(max_length=255)
     item_count = models.IntegerField()
     submission_date = models.DateField()
     processed_date = models.DateField(null=True, blank=True)
     return_date = models.DateField(null=True, blank=True)
 
-    #append .pdf to primary key to return vendor_filename
-    def get_vendor_filename(self):
-        return str(self.id + '.pdf')
-        
+    """
     def save(self, *args, **kwargs):
-        pass
+        if not self.pk:
+            self.submission_date = datetime.datetime.today()
+        super(Batch, self).save(*args, **kwargs)
+        #if self.vendor_filename == None: 
+        #    self.part.order.project.id 
+    """
+    def save(self, *args, **kwargs):
+        print 'saving'
+        if not self.pk:
+            proj_id = self.part.order.project.id
+            c_id = str(Client.objects.get(project=proj_id).id)
+            print 'c_id: {}'.format(c_id)
+            while len(c_id) < 3:
+                c_id = '0' + c_id
+            try:
+                b_id = str(Batch.objects.filter(id__startswith=c_id).order_by('-id')[0].id)
+            except (Batch.DoesNotExist, IndexError) as e:
+                b_id = str(1)
+            while len(b_id) < 7:
+                b_id = '0' + b_id
+            print 'c_id: {}'.format(c_id)
+            print 'b_id: {}'.format(b_id)
+            self.vendor_filename = c_id + b_id + '.pdf'
+            self.id = int(c_id + b_id)
+            self.submission_date = datetime.datetime.today()
+        super(Batch, self).save(*args, **kwargs)
 
 
 class Registrant(models.Model):

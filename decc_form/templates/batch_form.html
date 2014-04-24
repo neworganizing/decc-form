@@ -1,11 +1,16 @@
-{% extends "base.html" %}
+{% extends "decc_base.html" %}
 {% block title %} DECC - Upload PDFs{% endblock %}
 {% block content %}
 <form enctype="multipart/form-data" action="" method="POST">
   {% csrf_token %}
-  {% for field in form %}
-  <p>{{field.label}}: {{field}} {{field.errors}}</p>
-  {% endfor %}
-  <button type="submit">Upload files</button>
+  {{ form.part }}
+  <p>{{ form.item_count.label }}: {{ form.item_count }} {{ form.item_count.errors }}</p>
+  <p>{{ form.client_filename.label_tag }}</p>
+  <p>
+    {{ form.client_filename.errors }}
+    {{ form.client_filename }}
+  </p>
+  <p><button type="submit" value="Upload">Upload files</button></p>
 </form>
 {% endblock %}
+

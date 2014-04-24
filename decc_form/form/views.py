@@ -5,7 +5,7 @@ from django.shortcuts import render_to_response
 
 #from braces.views import LoginRequiredMixin
 
-from .models import Order, Part, Client, Type
+from .models import Order, Part, Client, Type, Batch
 from .forms import ClientSelectionForm, PartForm, BatchUploadForm
 import datetime as dt
 
@@ -76,58 +76,58 @@ class PartView(TemplateView):
             form_type = Type.objects.get(pk=request.POST.get('form_type'))
             item_count = request.POST.get('num_items')
             batch_count = request.POST.get('num_batches')
-            part = Part(order=order, state=state, form_type=form_type, item_count=item_count, batch_count=batch_count, rush=False)
+            rush = request.POST.get('rush')
+            part = Part(order=order, state=state, form_type=form_type, item_count=item_count, batch_count=batch_count, rush=rush)
             part.save()
             return HttpResponseRedirect('/order/{0}/part/{1}/batch/'.format(part.order.id, part.id))
         else:
             return self.render_to_response(context)
 
 class BatchView(TemplateView):
-
+    
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(*args, **kwargs)
+        form = BatchUploadForm(initial={'part': kwargs['part_id']})
+                                    #'submission_date': dt.datetime.today()})
+        context['form'] = form
+        return self.render_to_response(context)
+    """
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(*args, **kwargs)
+        #form = BatchUploadForm(initial={'part': kwargs['part_id'], 'submission_date': dt.datetime.today()})
+        
+        batch_form = formset_factory(BatchUploadForm, extra = 
+        context['form'] = form
+        return self.render_to_response(context)
+    """
     def post(self, request, *args, **kwargs):
         context = super(BatchView, self).get_context_data(*args, **kwargs)
         form = BatchUploadForm(request.POST, request.FILES)
-
+        context['form'] = form
+        print form.is_bound
         if form.is_valid():
-            handle_upload(request.FILES['batch_file'])
+            part = Part.objects.get(pk=request.POST.get('part'))
+            client_filename = request.FILES['client_filename']
+            item_count = request.POST.get('item_count')
+            batch = Batch(part=part, client_filename=client_filename, item_count=item_count)
+            batch.save()
             return HttpResponseRedirect('/thanks/')
         else:
-            form = BatchUploadForm()
-        return render_to_response(context)
-            
-"""
-Django Docs
-def upload_file(request):
-    if request.method == 'POST':
-        form = UploadFileForm(request.POST, request.FILES)
+            print form.errors
+            print 'NOT VALID'
+            return self.render_to_response(context)
+    """
+    def post(self, request, *args, **kwargs):
+        context = super(BatchView, self).get_context_data(*args, **kwargs)
+        form = BatchUploadForm(request.POST, request.FILES)
+        context['form'] = form
+        print form.is_bound
         if form.is_valid():
-            handle_uploaded_file(request.FILES['file'])
-            return HttpResponseRedirect('/success/url/')
-    else:
-        form = UploadFileForm()
-    return render_to_response('upload.html', {'form': form})
-"""
-"""
-#Experiment with CBVs gone horribly wrong
-
-class PartActionMixin(object):
-    fields = ('state', 'item_count', 'batch_count', 'type_id')
-    
-    @property
-    def success_msg(self):
-        return NotImplemented
-
-    def form_valid(self, form):
-        messages.info(self.request, self.success_msg)
-        return super(PartActionMixin, self).form_valid(form)
-
-#first arg: LoginRequiredMixin
-class PartCreateView(PartActionMixin, CreateView):
-    model = Part
-    success_msg = 'Part successfully created'
-
-#first arg: LoginRequiredMixin
-class PartDetailView(DetailView):
-    model = Part
-
-"""
+            form['part'] = Part.objects.get(pk=request.POST.get('part'))
+            form.save()
+            return HttpResponseRedirect('/thanks/')
+        else:
+            print form.errors
+            print 'NOT VALID'
+            return self.render_to_response(context)
+    """
