@@ -3,7 +3,16 @@ from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
-from django.conf import settings
+
+try:
+    from django.contrib.auth import get_user_model
+except ImportError:
+    from django.contrib.auth.models import User
+else:
+    User = get_user_model()
+
+user_orm_label = '%s.%s' % (User._meta.app_label, User._meta.object_name)
+user_model_label = '%s.%s' % (User._meta.app_label, User._meta.module_name)
 
 class Migration(SchemaMigration):
 
@@ -22,7 +31,7 @@ class Migration(SchemaMigration):
         # Adding model 'Contact'
         db.create_table(u'decc_form_contact', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.OneToOneField')(to=orm[settings.AUTH_USER_MODEL], unique=True)),
+            ('user', self.gf('django.db.models.fields.related.OneToOneField')(to=orm[user_orm_label], unique=True)),
             ('work_phone', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('cell_phone', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('fax', self.gf('django.db.models.fields.CharField')(max_length=255)),
@@ -226,6 +235,17 @@ class Migration(SchemaMigration):
 
 
     models = {        
+        user_model_label: {
+            'Meta': {
+                'object_name': User.__name__,
+                'db_table': "'%s'" % User._meta.db_table
+                },
+            User._meta.pk.attname: (
+                'django.db.models.fields.AutoField', [],
+                {'primary_key': 'True', 
+                 'db_column': "'%s'" % User._meta.pk.column}
+            ),
+        },
         u'decc_form.address': {
             'Meta': {'object_name': 'Address'},
             'city': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
@@ -286,7 +306,7 @@ class Migration(SchemaMigration):
             'fax': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'modified_date': ('django.db.models.fields.DateField', [], {}),
-            'user': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm[settings.AUTH_USER_MODEL]", 'unique': 'True'}),
+            'user': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm["+user_orm_label+"]", 'unique': 'True'}),
             'work_phone': ('django.db.models.fields.CharField', [], {'max_length': '255'})
         },
         u'decc_form.order': {
