@@ -1,7 +1,15 @@
-Django==1.6.1
+Django==1.6.2
+ProxyTypes==0.9
 South==0.8.4
-coverage==3.7.1
-django-localflavor==1.0
-psycopg2==2.5.2
-selenium==2.40.0
+django-classy-tags==0.4
+-e git://github.com/tanderegg/django-cms.git@5ff99942db5c7b5e2d240507ba6a2934c3020077#egg=django_cms-origin/local-develop
+django-mptt==0.6.0
+django-sekizai==0.7
+djangocms-admin-style==0.2.0
+html5lib==0.999
+six==1.5.2
+stevedore==0.13
+virtualenv==1.10.1
+virtualenv-clone==0.2.4
+virtualenvwrapper==4.1.1
 wsgiref==0.1.2

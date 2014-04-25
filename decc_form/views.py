@@ -3,7 +3,7 @@ from django.views.generic import TemplateView, CreateView, DetailView
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response
 from django.forms.formsets import formset_factory
-#from braces.views import LoginRequiredMixin
+from braces.views import LoginRequiredMixin
 
 from .models import Order, Part, Client, Type, Batch, Project
 from .forms import ClientSelectionForm, PartForm, BatchUploadForm, BatchFormSet
@@ -11,7 +11,7 @@ import datetime as dt
 
 
 #first arg: LoginRequiredMixin
-class OrderView(TemplateView):
+class OrderView(LoginRequiredMixin, TemplateView):
     
     def get(self, request, *args, **kwargs):
         context = super(OrderView, self).get_context_data(*args, **kwargs)
@@ -39,7 +39,7 @@ class OrderView(TemplateView):
         return HttpResponseRedirect('/order/{0}/part/'.format(order.id))
 
 
-class PartView(TemplateView):
+class PartView(LoginRequiredMixin, TemplateView):
     form_class = PartForm
 
     def get(self, request, *args, **kwargs):
@@ -74,7 +74,7 @@ class PartView(TemplateView):
             return self.render_to_response(context)
 
 
-class BatchView(TemplateView):
+class BatchView(LoginRequiredMixin, TemplateView):
    
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(*args, **kwargs)
