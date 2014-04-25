@@ -1,0 +1,32 @@
+html {
+    font-family: sans-serif;
+}
+a {
+    text-decoration: none;
+}
+a:link {
+    color: #000;
+}
+a:visited {
+    color: #000;
+}
+a:hover {
+    color: #049f9f;
+}
+img {
+    display: block;
+    margin: auto;
+}
+div.logo p {
+    text-align: center;
+    font-size: 140%;
+    margin-top: -40px;
+    color: #000;
+    padding-bottom: 300px;
+}
+div.footer p {
+    text-align: center;
+    font-size: 70%;
+    padding-bottom: 20px;
+    color: #049f9f;
+}
