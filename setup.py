@@ -1,7 +1,7 @@
 from distutils.core import setup
 
 setup(
-    name='decc_form',
+    name='decc-form',
     version='0.1',
     packages=['decc_form,'],
     license='copyright NOI',
