@@ -9,13 +9,6 @@ from .models import Order, Part, Client, Type, Batch, Project
 from .forms import ClientSelectionForm, PartForm, BatchUploadForm, BatchFormSet
 import datetime as dt
 
-class IndexView(TemplateView):
-    template_name = 'index.html'
-
-
-class ThanksView(TemplateView):
-    template_name = 'thanks.html'
-
 
 #first arg: LoginRequiredMixin
 class OrderView(TemplateView):
