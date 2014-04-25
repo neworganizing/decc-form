@@ -286,7 +286,7 @@ class Migration(SchemaMigration):
             'fax': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'modified_date': ('django.db.models.fields.DateField', [], {}),
-            'user': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['auth.User']", 'unique': 'True'}),
+            'user': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm[settings.AUTH_USER_MODEL]", 'unique': 'True'}),
             'work_phone': ('django.db.models.fields.CharField', [], {'max_length': '255'})
         },
         u'decc_form.order': {
