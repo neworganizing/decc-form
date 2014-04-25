@@ -73,6 +73,13 @@ class Type(models.Model):
         return str(self.type_name)
 
 
+class Committee(models.Model):
+    name = models.CharField(max_length=255)
+    projects = models.ManyToManyField(Project)
+
+    def __unicode__(self):
+        return str(self.name)
+
 class Order(models.Model):
     project = models.ForeignKey(Project)
     order_date = models.DateField(default=datetime.datetime.today())
@@ -94,6 +101,7 @@ class Batch(models.Model):
     #PK = 3 digit client_id, 7 digit batch_id, based on last batch from that project
     id = models.PositiveIntegerField(primary_key=True)
     part = models.ForeignKey(Part) 
+    committee = models.ForeignKey(Committee, null=True, blank=True)
     client_filename = models.FileField(upload_to='batchfiles/')
     vendor_filename = models.CharField(max_length=255)
     item_count = models.IntegerField()
@@ -109,7 +117,6 @@ class Batch(models.Model):
             while len(c_id) < 3:
                 c_id = '0' + c_id
             try:
-                print str(Batch.objects.filter(id__startswith=int(c_id)).order_by('-id')[0].id)
                 b_id = str(Batch.objects.filter(id__startswith=int(c_id)).order_by('-id')[0].id + 1)[-7:] 
             except (Batch.DoesNotExist, IndexError) as e:
                 b_id = str(1)

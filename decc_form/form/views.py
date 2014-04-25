@@ -5,8 +5,8 @@ from django.shortcuts import render_to_response
 from django.forms.formsets import formset_factory
 #from braces.views import LoginRequiredMixin
 
-from .models import Order, Part, Client, Type, Batch
-from .forms import ClientSelectionForm, PartForm, BatchUploadForm
+from .models import Order, Part, Client, Type, Batch, Project
+from .forms import ClientSelectionForm, PartForm, BatchUploadForm, BatchFormSet
 import datetime as dt
 
 class IndexView(TemplateView):
@@ -19,12 +19,12 @@ class ThanksView(TemplateView):
 
 #first arg: LoginRequiredMixin
 class OrderView(TemplateView):
-
+    
     def get(self, request, *args, **kwargs):
         context = super(OrderView, self).get_context_data(*args, **kwargs)
         context['form'] = ClientSelectionForm(user=request.user)
         return self.render_to_response(context)
-
+        
     def post(self, request, *args, **kwargs):
         context = super(OrderView, self).get_context_data(*args, **kwargs)
         context['form'] = ClientSelectionForm(request.POST)
@@ -87,17 +87,18 @@ class BatchView(TemplateView):
         context = self.get_context_data(*args, **kwargs)
         items = Part.objects.get(pk=kwargs['part_id']).batch_count 
         print 'items: {}'.format(items)
-        BatchUploadFormSet = formset_factory(BatchUploadForm, extra=0)
         initial = []
         for i in range(items):
             initial.append({'part': kwargs['part_id']})
-        formset  = BatchUploadFormSet(initial=initial)
+        project_id = Order.objects.get(pk=kwargs['order_id']).project_id
+        BatchUploadFormSet = formset_factory(BatchUploadForm, extra=0, formset=BatchFormSet)
+        formset  = BatchUploadFormSet(initial=initial, project_id=project_id)
         context['formset'] = formset
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
         context = super(BatchView, self).get_context_data(*args, **kwargs)
-        BatchUploadFormSet = formset_factory(BatchUploadForm, extra=0)
+        BatchUploadFormSet = formset_factory(BatchUploadForm, extra=0, formset=BatchFormSet)
         formset = BatchUploadFormSet(request.POST, request.FILES)
         context['formset'] = formset
         
