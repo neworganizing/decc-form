@@ -7,13 +7,15 @@
   {% for form in formset %}
   {{ form.part }}
   <p>{{ form.item_count.label }}: {{ form.item_count }} {{ form.item_count.errors }}</p>
-  <p>{{form.committee.label }}: </br>{{ form.committee }} {{ form.committee.errors }}</p>
+  
+  <p>{{form.committee.label }}{{ form.committee }} {{ form.committee.errors }}</p>
   <p>{{ form.client_filename.label_tag }}</p>
   <p>
     {{ form.client_filename.errors }}
     {{ form.client_filename }}
   </p>
   {% endfor %}
+  <p>Once you push this button you can never ever ever go back. Think about your choices. All of them. Think hard. Are you ok with your life?</p>
   <p><button type="submit" value="Upload">Upload files</button></p>
 </form>
 {% endblock %}

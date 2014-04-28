@@ -13,7 +13,7 @@ a:visited {
 a:hover {
     color: #049f9f;
 }
-img {
+div.logo img {
     display: block;
     margin: auto;
 }
@@ -24,9 +24,38 @@ div.logo p {
     color: #000;
     padding-bottom: 300px;
 }
-div.footer p {
+div.home-footer p {
     text-align: center;
     font-size: 70%;
     padding-bottom: 20px;
     color: #049f9f;
 }
+div.sidebar {
+    margin: -8px, 0px, -8px, -8px;
+    float: left;
+    clear: left;
+    width: 40%;
+}
+div.sidebar img {
+    float: left; 
+    overflow: hidden;
+}
+div.content {
+    float: right;
+    width: 60%;
+    text-align: center;
+}
+div.deccform {
+
+}
+div.page-footer {
+    text-align: center;
+    padding-top: 1000px;
+}
+div.page-footer p {
+    text-align: center;
+    font-size: 70%;
+    padding-bottom: 20px;
+    color: #049f9f;
+}
+

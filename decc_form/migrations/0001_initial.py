@@ -4,15 +4,6 @@ from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
 
-try:
-    from django.contrib.auth import get_user_model
-except ImportError:
-    from django.contrib.auth.models import User
-else:
-    User = get_user_model()
-
-user_orm_label = '%s.%s' % (User._meta.app_label, User._meta.object_name)
-user_model_label = '%s.%s' % (User._meta.app_label, User._meta.module_name)
 
 class Migration(SchemaMigration):
 
@@ -20,21 +11,21 @@ class Migration(SchemaMigration):
         # Adding model 'Address'
         db.create_table(u'decc_form_address', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('street1', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('street1', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
             ('street2', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('city', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('state', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('zipcode', self.gf('django.db.models.fields.CharField')(max_length=32)),
+            ('city', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('state', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('zipcode', self.gf('django.db.models.fields.CharField')(max_length=32, null=True, blank=True)),
         ))
         db.send_create_signal(u'decc_form', ['Address'])
 
         # Adding model 'Contact'
         db.create_table(u'decc_form_contact', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.OneToOneField')(to=orm[user_orm_label], unique=True)),
-            ('work_phone', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('cell_phone', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('fax', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('user', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True)),
+            ('work_phone', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('cell_phone', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('fax', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
             ('added_date', self.gf('django.db.models.fields.DateField')()),
             ('modified_date', self.gf('django.db.models.fields.DateField')()),
         ))
@@ -56,10 +47,10 @@ class Migration(SchemaMigration):
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('billable', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['decc_form.Billable'])),
             ('start_date', self.gf('django.db.models.fields.DateField')()),
-            ('end_date', self.gf('django.db.models.fields.DateField')()),
+            ('end_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
             ('order_frequency', self.gf('django.db.models.fields.IntegerField')()),
             ('estimated_item_count', self.gf('django.db.models.fields.IntegerField')()),
-            ('notes', self.gf('django.db.models.fields.TextField')()),
+            ('notes', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
             ('added_date', self.gf('django.db.models.fields.DateField')()),
             ('modified_date', self.gf('django.db.models.fields.DateField')()),
         ))
@@ -90,7 +81,7 @@ class Migration(SchemaMigration):
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('project', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['decc_form.Project'])),
             ('type_name', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('field_notes', self.gf('django.db.models.fields.TextField')()),
+            ('field_notes', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
             ('cost_rate', self.gf('django.db.models.fields.DecimalField')(max_digits=4, decimal_places=2)),
             ('cost_noi', self.gf('django.db.models.fields.DecimalField')(max_digits=5, decimal_places=3)),
         ))
@@ -117,6 +108,7 @@ class Migration(SchemaMigration):
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('project', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['decc_form.Project'])),
             ('order_date', self.gf('django.db.models.fields.DateField')(default=datetime.datetime(2014, 4, 25, 0, 0))),
+            ('digital', self.gf('django.db.models.fields.BooleanField')(default=True)),
             ('bill_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
             ('paid_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
         ))
@@ -131,7 +123,12 @@ class Migration(SchemaMigration):
             ('state', self.gf('django.db.models.fields.CharField')(max_length=2)),
             ('item_count', self.gf('django.db.models.fields.IntegerField')()),
             ('batch_count', self.gf('django.db.models.fields.IntegerField')()),
-            ('extras', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('van', self.gf('django.db.models.fields.BooleanField')()),
+            ('quad', self.gf('django.db.models.fields.BooleanField')()),
+            ('match', self.gf('django.db.models.fields.BooleanField')()),
+            ('destroy_files', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('return_files', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('extras', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
         ))
         db.send_create_signal(u'decc_form', ['Part'])
 
@@ -153,30 +150,30 @@ class Migration(SchemaMigration):
         db.create_table(u'decc_form_registrant', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('batch', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['decc_form.Batch'])),
-            ('citizenship', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('age', self.gf('django.db.models.fields.CharField')(max_length=10)),
-            ('dob_mm', self.gf('django.db.models.fields.CharField')(max_length=2)),
-            ('dob_dd', self.gf('django.db.models.fields.CharField')(max_length=2)),
-            ('dob_yy', self.gf('django.db.models.fields.CharField')(max_length=4)),
-            ('first_name', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('middle_name', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('last_name', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('suffix', self.gf('django.db.models.fields.CharField')(max_length=64)),
-            ('home_area_code', self.gf('django.db.models.fields.CharField')(max_length=16)),
-            ('home_phone', self.gf('django.db.models.fields.CharField')(max_length=32)),
-            ('race', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('party', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('gender', self.gf('django.db.models.fields.CharField')(max_length=64)),
+            ('citizenship', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('age', self.gf('django.db.models.fields.CharField')(max_length=10, null=True, blank=True)),
+            ('dob_mm', self.gf('django.db.models.fields.CharField')(max_length=2, null=True, blank=True)),
+            ('dob_dd', self.gf('django.db.models.fields.CharField')(max_length=2, null=True, blank=True)),
+            ('dob_yy', self.gf('django.db.models.fields.CharField')(max_length=4, null=True, blank=True)),
+            ('first_name', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('middle_name', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('last_name', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('suffix', self.gf('django.db.models.fields.CharField')(max_length=64, null=True, blank=True)),
+            ('home_area_code', self.gf('django.db.models.fields.CharField')(max_length=16, null=True, blank=True)),
+            ('home_phone', self.gf('django.db.models.fields.CharField')(max_length=32, null=True, blank=True)),
+            ('race', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('party', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('gender', self.gf('django.db.models.fields.CharField')(max_length=64, null=True, blank=True)),
             ('date_signed_mm', self.gf('django.db.models.fields.CharField')(max_length=2)),
-            ('date_signed_dd', self.gf('django.db.models.fields.CharField')(max_length=2)),
-            ('date_signed_yy', self.gf('django.db.models.fields.CharField')(max_length=4)),
-            ('mobile_area_code', self.gf('django.db.models.fields.CharField')(max_length=16)),
-            ('mobile_phone', self.gf('django.db.models.fields.CharField')(max_length=32)),
-            ('email_address', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('volunteer', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('previous_name', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('bad_image', self.gf('django.db.models.fields.CharField')(max_length=32)),
-            ('error_code', self.gf('django.db.models.fields.IntegerField')()),
+            ('date_signed_dd', self.gf('django.db.models.fields.CharField')(max_length=2, null=True, blank=True)),
+            ('date_signed_yy', self.gf('django.db.models.fields.CharField')(max_length=4, null=True, blank=True)),
+            ('mobile_area_code', self.gf('django.db.models.fields.CharField')(max_length=16, null=True, blank=True)),
+            ('mobile_phone', self.gf('django.db.models.fields.CharField')(max_length=32, null=True, blank=True)),
+            ('email_address', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('volunteer', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('previous_name', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('bad_image', self.gf('django.db.models.fields.CharField')(max_length=32, null=True, blank=True)),
+            ('error_code', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
         ))
         db.send_create_signal(u'decc_form', ['Registrant'])
 
@@ -234,26 +231,51 @@ class Migration(SchemaMigration):
         db.delete_table(u'decc_form_registrantaddress')
 
 
-    models = {        
-        user_model_label: {
-            'Meta': {
-                'object_name': User.__name__,
-                'db_table': "'%s'" % User._meta.db_table
-                },
-            User._meta.pk.attname: (
-                'django.db.models.fields.AutoField', [],
-                {'primary_key': 'True', 
-                 'db_column': "'%s'" % User._meta.pk.column}
-            ),
+    models = {
+        u'auth.group': {
+            'Meta': {'object_name': 'Group'},
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '80'}),
+            'permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'})
+        },
+        u'auth.permission': {
+            'Meta': {'ordering': "(u'content_type__app_label', u'content_type__model', u'codename')", 'unique_together': "((u'content_type', u'codename'),)", 'object_name': 'Permission'},
+            'codename': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contenttypes.ContentType']"}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
+        },
+        u'auth.user': {
+            'Meta': {'object_name': 'User'},
+            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
+            'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
+            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
+            'groups': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "u'user_set'", 'blank': 'True', 'to': u"orm['auth.Group']"}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'is_superuser': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
+            'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
+            'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
+            'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "u'user_set'", 'blank': 'True', 'to': u"orm['auth.Permission']"}),
+            'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
+        },
+        u'contenttypes.contenttype': {
+            'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
+            'app_label': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         u'decc_form.address': {
             'Meta': {'object_name': 'Address'},
-            'city': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'city': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'state': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'street1': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'state': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'street1': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'street2': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'zipcode': ('django.db.models.fields.CharField', [], {'max_length': '32'})
+            'zipcode': ('django.db.models.fields.CharField', [], {'max_length': '32', 'null': 'True', 'blank': 'True'})
         },
         u'decc_form.batch': {
             'Meta': {'object_name': 'Batch'},
@@ -302,16 +324,17 @@ class Migration(SchemaMigration):
         u'decc_form.contact': {
             'Meta': {'object_name': 'Contact'},
             'added_date': ('django.db.models.fields.DateField', [], {}),
-            'cell_phone': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'fax': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'cell_phone': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'fax': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'modified_date': ('django.db.models.fields.DateField', [], {}),
-            'user': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm["+user_orm_label+"]", 'unique': 'True'}),
-            'work_phone': ('django.db.models.fields.CharField', [], {'max_length': '255'})
+            'user': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['auth.User']", 'unique': 'True'}),
+            'work_phone': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
         },
         u'decc_form.order': {
             'Meta': {'object_name': 'Order'},
             'bill_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'digital': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'order_date': ('django.db.models.fields.DateField', [], {'default': 'datetime.datetime(2014, 4, 25, 0, 0)'}),
             'paid_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
@@ -320,55 +343,60 @@ class Migration(SchemaMigration):
         u'decc_form.part': {
             'Meta': {'object_name': 'Part'},
             'batch_count': ('django.db.models.fields.IntegerField', [], {}),
-            'extras': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'destroy_files': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'extras': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'form_type': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['decc_form.Type']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'item_count': ('django.db.models.fields.IntegerField', [], {}),
+            'match': ('django.db.models.fields.BooleanField', [], {}),
             'order': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['decc_form.Order']"}),
+            'quad': ('django.db.models.fields.BooleanField', [], {}),
+            'return_files': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'rush': ('django.db.models.fields.BooleanField', [], {}),
-            'state': ('django.db.models.fields.CharField', [], {'max_length': '2'})
+            'state': ('django.db.models.fields.CharField', [], {'max_length': '2'}),
+            'van': ('django.db.models.fields.BooleanField', [], {})
         },
         u'decc_form.project': {
             'Meta': {'object_name': 'Project'},
             'added_date': ('django.db.models.fields.DateField', [], {}),
             'billable': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['decc_form.Billable']"}),
-            'end_date': ('django.db.models.fields.DateField', [], {}),
+            'end_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
             'estimated_item_count': ('django.db.models.fields.IntegerField', [], {}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'modified_date': ('django.db.models.fields.DateField', [], {}),
-            'notes': ('django.db.models.fields.TextField', [], {}),
+            'notes': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'order_frequency': ('django.db.models.fields.IntegerField', [], {}),
             'start_date': ('django.db.models.fields.DateField', [], {})
         },
         u'decc_form.registrant': {
             'Meta': {'object_name': 'Registrant'},
-            'addresses': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['decc_form.Address']", 'through': u"orm['decc_form.RegistrantAddress']", 'symmetrical': 'False'}),
-            'age': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
-            'bad_image': ('django.db.models.fields.CharField', [], {'max_length': '32'}),
+            'addresses': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': u"orm['decc_form.Address']", 'null': 'True', 'through': u"orm['decc_form.RegistrantAddress']", 'blank': 'True'}),
+            'age': ('django.db.models.fields.CharField', [], {'max_length': '10', 'null': 'True', 'blank': 'True'}),
+            'bad_image': ('django.db.models.fields.CharField', [], {'max_length': '32', 'null': 'True', 'blank': 'True'}),
             'batch': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['decc_form.Batch']"}),
-            'citizenship': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'date_signed_dd': ('django.db.models.fields.CharField', [], {'max_length': '2'}),
+            'citizenship': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'date_signed_dd': ('django.db.models.fields.CharField', [], {'max_length': '2', 'null': 'True', 'blank': 'True'}),
             'date_signed_mm': ('django.db.models.fields.CharField', [], {'max_length': '2'}),
-            'date_signed_yy': ('django.db.models.fields.CharField', [], {'max_length': '4'}),
-            'dob_dd': ('django.db.models.fields.CharField', [], {'max_length': '2'}),
-            'dob_mm': ('django.db.models.fields.CharField', [], {'max_length': '2'}),
-            'dob_yy': ('django.db.models.fields.CharField', [], {'max_length': '4'}),
-            'email_address': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'error_code': ('django.db.models.fields.IntegerField', [], {}),
-            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'gender': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
-            'home_area_code': ('django.db.models.fields.CharField', [], {'max_length': '16'}),
-            'home_phone': ('django.db.models.fields.CharField', [], {'max_length': '32'}),
+            'date_signed_yy': ('django.db.models.fields.CharField', [], {'max_length': '4', 'null': 'True', 'blank': 'True'}),
+            'dob_dd': ('django.db.models.fields.CharField', [], {'max_length': '2', 'null': 'True', 'blank': 'True'}),
+            'dob_mm': ('django.db.models.fields.CharField', [], {'max_length': '2', 'null': 'True', 'blank': 'True'}),
+            'dob_yy': ('django.db.models.fields.CharField', [], {'max_length': '4', 'null': 'True', 'blank': 'True'}),
+            'email_address': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'error_code': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'gender': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True', 'blank': 'True'}),
+            'home_area_code': ('django.db.models.fields.CharField', [], {'max_length': '16', 'null': 'True', 'blank': 'True'}),
+            'home_phone': ('django.db.models.fields.CharField', [], {'max_length': '32', 'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'last_name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'middle_name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'mobile_area_code': ('django.db.models.fields.CharField', [], {'max_length': '16'}),
-            'mobile_phone': ('django.db.models.fields.CharField', [], {'max_length': '32'}),
-            'party': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'previous_name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'race': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'suffix': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
-            'volunteer': ('django.db.models.fields.CharField', [], {'max_length': '255'})
+            'last_name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'middle_name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'mobile_area_code': ('django.db.models.fields.CharField', [], {'max_length': '16', 'null': 'True', 'blank': 'True'}),
+            'mobile_phone': ('django.db.models.fields.CharField', [], {'max_length': '32', 'null': 'True', 'blank': 'True'}),
+            'party': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'previous_name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'race': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'suffix': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True', 'blank': 'True'}),
+            'volunteer': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
         },
         u'decc_form.registrantaddress': {
             'Meta': {'object_name': 'RegistrantAddress'},
@@ -381,7 +409,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Type'},
             'cost_noi': ('django.db.models.fields.DecimalField', [], {'max_digits': '5', 'decimal_places': '3'}),
             'cost_rate': ('django.db.models.fields.DecimalField', [], {'max_digits': '4', 'decimal_places': '2'}),
-            'field_notes': ('django.db.models.fields.TextField', [], {}),
+            'field_notes': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'project': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['decc_form.Project']"}),
             'type_name': ('django.db.models.fields.CharField', [], {'max_length': '255'})

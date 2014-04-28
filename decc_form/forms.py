@@ -1,10 +1,11 @@
 from django import forms
 from django.forms.formsets import BaseFormSet
 from django.utils.functional import cached_property
-from localflavor.us.us_states import US_STATES, STATE_CHOICES
-from localflavor.us.forms import USStateField
-from models import Type, Client, Part, Committee, Project
 
+from localflavor.us.forms import USStateField
+from localflavor.us.us_states import US_STATES, STATE_CHOICES
+
+from models import Type, Client, Part, Committee, Project
 
 
 class ClientSelectionForm(forms.Form):
@@ -26,7 +27,10 @@ class PartForm(forms.Form):
     num_items = forms.IntegerField()
     num_batches = forms.IntegerField()
     rush = forms.BooleanField(label='Check this box if your order must be rushed', required=False)
-
+    van = forms.BooleanField(label='VAN Committee?', required=False)
+    quad = forms.BooleanField(label='Quad?', required=False)
+    match = forms.BooleanField(label='Match your data to Catalist etc?', required=False)
+    
     def __init__(self, *args, **kwargs):
         self.project_id = kwargs.pop('project_id', None)
         super(PartForm, self).__init__(*args, **kwargs)
@@ -36,17 +40,17 @@ class PartForm(forms.Form):
 class BatchFormSet(BaseFormSet):
     @cached_property
     def forms(self):
-        forms = [self._construct_form(i, queryset=self.queryset) for i in xrange(self.total_form_count())]
+        forms = [self._construct_form(i, queryset=self.queryset, visible=self.visible) for i in xrange(self.total_form_count())]
         return forms
 
     def __init__(self, *args, **kwargs):
         self.project_id = kwargs.pop('project_id', None)
+        self.visible = kwargs.pop('visible', None)
         super(BatchFormSet, self).__init__(*args, **kwargs)
         if self.project_id:
             project = Project.objects.get(pk=self.project_id)
             self.queryset = project.committee_set.all()
         
-
 
 class BatchUploadForm(forms.Form):
     part = forms.IntegerField(widget=forms.HiddenInput())
@@ -54,11 +58,16 @@ class BatchUploadForm(forms.Form):
     item_count = forms.IntegerField(required=True)
     client_filename = forms.FileField(required=True)
 
-
     def __init__(self, *args, **kwargs):
         self.queryset = kwargs.pop('queryset', None)
-        print self.queryset
+        self.visible = kwargs.pop('visible', None)
         super(BatchUploadForm, self).__init__(*args, **kwargs)
-        self.fields['committee'].queryset = self.queryset
+        if self.visible:
+            self.fields['committee'].queryset = self.queryset
+        else:
+            self.fields['committee'].widget=forms.HiddenInput()
+            self.fields['committee'].label = ''
+            self.fields['committee'].required=False
+            
 
 

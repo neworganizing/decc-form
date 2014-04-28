@@ -1,13 +1,15 @@
-from django.db import models
-from django.conf import settings 
 import datetime
 
+from django.conf import settings 
+from django.db import models
+
+
 class Address(models.Model):
-    street1 = models.CharField(max_length=255)
+    street1 = models.CharField(max_length=255, null=True, blank=True)
     street2 = models.CharField(max_length=255, null=True, blank=True)
-    city = models.CharField(max_length=255)
-    state = models.CharField(max_length=255)
-    zipcode = models.CharField(max_length=32)
+    city = models.CharField(max_length=255, null=True, blank=True)
+    state = models.CharField(max_length=255, null=True, blank=True)
+    zipcode = models.CharField(max_length=32, null=True, blank=True)
 
     def __unicode__(self):
         return str(self.street1 + self.city +','+self.state)
@@ -18,39 +20,43 @@ class Contact(models.Model):
     #in user
     #name = models.CharField(max_length=255)
     #email = models.CharField(max_length=255)
-    work_phone = models.CharField(max_length=255)
-    cell_phone = models.CharField(max_length=255)
-    fax = models.CharField(max_length=255)
-    added_date = models.DateField()
-    modified_date = models.DateField()
+    work_phone = models.CharField(max_length=255, null=True, blank=True)
+    cell_phone = models.CharField(max_length=255, null=True, blank=True)
+    fax = models.CharField(max_length=255, null=True, blank=True)
+    added_date = models.DateField(auto_now_add=True)
+    modified_date = models.DateField(auto_now=True)
 
 
 class Billable(models.Model):
     contact = models.ForeignKey(Contact)
     address = models.ForeignKey(Address)
     tax_status = models.CharField(max_length=255)
-    added_date = models.DateField()
-    modified_date = models.DateField()
+    added_date = models.DateField(auto_now_add=True)
+    modified_date = models.DateField(auto_now=True)
 
    
 class Project(models.Model):
     #client = models.ForeignKey(Client)
     billable = models.ForeignKey(Billable)
     start_date = models.DateField()
-    end_date = models.DateField()
+    end_date = models.DateField(null=True, blank=True)
     order_frequency = models.IntegerField()
     estimated_item_count = models.IntegerField()
-    notes = models.TextField()
-    added_date = models.DateField()
-    modified_date = models.DateField()
+    notes = models.TextField(null=True, blank=True)
+    added_date = models.DateField(auto_now_add=True)
+    modified_date = models.DateField(auto_now=True)
    
+    def __unicode__(self):
+        return str('{}: {} - {}'.format(self.id, self.start_date, self.end_date))
+
+
 class Client(models.Model):
     address = models.ForeignKey(Address)
     project = models.ForeignKey(Project)
     contacts = models.ManyToManyField(Contact, through='ClientContact')
     org_name = models.CharField(max_length=255)
-    added_date = models.DateTimeField()
-    modified_date = models.DateTimeField()
+    added_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
        
     def __unicode__(self):
         return str(self.org_name)
@@ -65,7 +71,7 @@ class ClientContact(models.Model):
 class Type(models.Model):
     project = models.ForeignKey(Project)
     type_name = models.CharField(max_length=255)
-    field_notes = models.TextField()
+    field_notes = models.TextField(null=True, blank=True)
     cost_rate = models.DecimalField(max_digits=4, decimal_places=2)
     cost_noi = models.DecimalField(max_digits=5, decimal_places=3)
 
@@ -83,6 +89,7 @@ class Committee(models.Model):
 class Order(models.Model):
     project = models.ForeignKey(Project)
     order_date = models.DateField(default=datetime.datetime.today())
+    digital = models.BooleanField(default=True)
     bill_date = models.DateField(null=True, blank=True)
     paid_date = models.DateField(null=True, blank=True)
     
@@ -94,9 +101,16 @@ class Part(models.Model):
     state = models.CharField(max_length=2)
     item_count = models.IntegerField()
     batch_count = models.IntegerField()
-    extras = models.CharField(max_length=255)
+    van = models.BooleanField()
+    quad = models.BooleanField()
+    match = models.BooleanField()
+    destroy_files = models.BooleanField(default=False)
+    return_files = models.BooleanField(default=False)
+    extras = models.CharField(max_length=255, null=True, blank=True)
 
-    
+    def __unicode__(self):
+        return str('{}: {}'.format(self.id, self.state))
+
 class Batch(models.Model):
     #PK = 3 digit client_id, 7 digit batch_id, based on last batch from that project
     id = models.PositiveIntegerField(primary_key=True)
@@ -130,31 +144,31 @@ class Batch(models.Model):
 
 class Registrant(models.Model):
     batch = models.ForeignKey(Batch)
-    citizenship = models.CharField(max_length=255)
-    age = models.CharField(max_length=10)
-    dob_mm = models.CharField(max_length=2)
-    dob_dd = models.CharField(max_length=2)
-    dob_yy = models.CharField(max_length=4)
-    first_name = models.CharField(max_length=255)
-    middle_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
-    suffix = models.CharField(max_length=64)
-    home_area_code = models.CharField(max_length=16)
-    home_phone = models.CharField(max_length=32)
-    race = models.CharField(max_length=255)
-    party = models.CharField(max_length=255)
-    gender = models.CharField(max_length=64)
-    date_signed_mm = models.CharField(max_length=2)
-    date_signed_dd = models.CharField(max_length=2)
-    date_signed_yy = models.CharField(max_length=4)
-    mobile_area_code = models.CharField(max_length=16)
-    mobile_phone = models.CharField(max_length=32)
-    email_address = models.CharField(max_length=255)
-    volunteer = models.CharField(max_length=255)
-    previous_name = models.CharField(max_length=255)
-    bad_image = models.CharField(max_length=32)
-    error_code = models.IntegerField()
-    addresses = models.ManyToManyField(Address, through='RegistrantAddress')
+    citizenship = models.CharField(max_length=255, null=True, blank=True)
+    age = models.CharField(max_length=10, null=True, blank=True)
+    dob_mm = models.CharField(max_length=2, null=True, blank=True)
+    dob_dd = models.CharField(max_length=2, null=True, blank=True)
+    dob_yy = models.CharField(max_length=4, null=True, blank=True)
+    first_name = models.CharField(max_length=255, null=True, blank=True)
+    middle_name = models.CharField(max_length=255, null=True, blank=True)
+    last_name = models.CharField(max_length=255, null=True, blank=True)
+    suffix = models.CharField(max_length=64, null=True, blank=True)
+    home_area_code = models.CharField(max_length=16, null=True, blank=True)
+    home_phone = models.CharField(max_length=32, null=True, blank=True)
+    race = models.CharField(max_length=255, null=True, blank=True)
+    party = models.CharField(max_length=255, null=True, blank=True)
+    gender = models.CharField(max_length=64, null=True, blank=True)
+    date_signed_mm = models.CharField(max_length=2, null=True, blank=True)
+    date_signed_dd = models.CharField(max_length=2, null=True, blank=True)
+    date_signed_yy = models.CharField(max_length=4, null=True, blank=True)
+    mobile_area_code = models.CharField(max_length=16, null=True, blank=True)
+    mobile_phone = models.CharField(max_length=32, null=True, blank=True)
+    email_address = models.CharField(max_length=255, null=True, blank=True)
+    volunteer = models.CharField(max_length=255, null=True, blank=True)
+    previous_name = models.CharField(max_length=255, null=True, blank=True)
+    bad_image = models.CharField(max_length=32, null=True, blank=True)
+    error_code = models.IntegerField(null=True, blank=True)
+    addresses = models.ManyToManyField(Address, through='RegistrantAddress', null=True, blank=True)
 
 
 class RegistrantAddress(models.Model):
