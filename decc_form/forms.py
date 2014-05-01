@@ -21,7 +21,7 @@ class ClientSelectionForm(forms.Form):
         self.fields['client'].queryset = queryset
 
 
-class PartForm(forms.Form):
+class OtherPartForm(forms.Form):
     state = USStateField(widget=forms.Select(choices=(('', 'Select a State'),)+US_STATES))
     form_type = forms.ModelChoiceField(queryset=Type.objects.all())  
     num_items = forms.IntegerField()
@@ -36,6 +36,24 @@ class PartForm(forms.Form):
         super(PartForm, self).__init__(*args, **kwargs)
         if self.project_id:
             self.fields['form_type'].queryset = Type.objects.filter(project_id=self.project_id)
+
+class PartForm(forms.ModelForm):
+    class Meta:
+        model = Part    
+        fields = ['order', 'state', 'form_type', 'item_count', 
+                  'batch_count', 'rush', 'van', 'quad', 'match']
+    state = USStateField(widget=forms.Select(choices=(('', 'Select a State'),)+US_STATES))
+    form_type = forms.ModelChoiceField(queryset=Type.objects.all())  
+
+    def __init__(self, *args, **kwargs):
+        self.project_id = kwargs.pop('project_id', None)
+        super(PartForm, self).__init__(*args, **kwargs)
+        self.fields['order'].widget = forms.HiddenInput()
+        self.fields['order'].label = ''
+        if self.project_id:
+            self.fields['form_type'].queryset = Type.objects.filter(project_id=self.project_id)
+        
+            
 
 class BatchFormSet(BaseFormSet):
     @cached_property

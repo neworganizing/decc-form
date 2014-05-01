@@ -3,6 +3,17 @@
 {% block content %}
 <form enctype="multipart/form-data" action="" method="POST">
   {% csrf_token %}
+  <p><button type="button" value="edit"><a href={{ link }}>&laquo Edit your order details</a></button></p>
+  <p> Order details:</br>
+    State: {{ part.state }}</br>
+    Form Type: {{ part.form_type }}</br>
+    Item Count: {{ part.item_count }}</br>
+    Rush? {{ part.rush }}</br>
+    VAN? {{ part.van }}</br>
+    Quad? {{ part.quad }}</br>
+    Match? {{ part.match }}</br>
+  </p>
+
   {{ formset.management_form }}
   {% for form in formset %}
   {{ form.part }}
@@ -15,7 +26,7 @@
     {{ form.client_filename }}
   </p>
   {% endfor %}
-  <p>Once you push this button you can never ever ever go back. Think about your choices. All of them. Think hard. Are you ok with your life?</p>
+  <p>Once you push this button you can never ever ever go back. Think about your choices. All of them. If you're cool with it, click away!</p>
   <p><button type="submit" value="Upload">Upload files</button></p>
 </form>
 {% endblock %}

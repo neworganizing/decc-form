@@ -53,41 +53,29 @@ class PartView(LoginRequiredMixin, TemplateView):
             order = Order.objects.get(pk=kwargs['order_id'])
         except Order.DoesNotExist:
             raise Http404
-        
-        form = PartForm(project_id=order.project_id)
+
+        if 'part_id' in kwargs:
+            part = Part.objects.get(pk=kwargs['part_id'])
+            form = PartForm(instance=part, project_id=order.project_id)
+        else:
+            form = PartForm(project_id=order.project_id)
+
         context['form'] = form
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
         context = self.get_context_data(*args, **kwargs)
-        form = PartForm(request.POST)
-
+        if 'part_id' in kwargs:
+            p = Part.objects.get(pk=kwargs['part_id'])
+            form = PartForm(request.POST, instance=p)
+        else:
+            form = PartForm(request.POST)
+        
         if form.is_valid():
-            order = Order.objects.get(pk=kwargs.pop('order_id', None))
-            state = request.POST.get('state')
-            form_type = Type.objects.get(pk=request.POST.get('form_type'))
-            item_count = request.POST.get('num_items')
-            batch_count = request.POST.get('num_batches')
-            rush = request.POST.get('rush', False)
-            van = request.POST.get('van', False)
-            quad = request.POST.get('quad', False)
-            match = request.POST.get('match', False)
-            part = Part(
-                order=order, 
-                state=state, 
-                form_type=form_type, 
-                item_count=item_count, 
-                batch_count=batch_count, 
-                rush=rush, 
-                van=van,
-                quad=quad,
-                match=match
-            )
-            part.save()
-            return HttpResponseRedirect('/order/{0}/part/{1}/batch/'.format(part.order.id, part.id))
+            part = form.save()
+            return HttpResponseRedirect('/order/{0}/part/{1}/batch/'.format(part.order_id, part.id))
         else:
             print form.errors
-
             return self.render_to_response(context)
 
 
@@ -95,16 +83,23 @@ class BatchView(LoginRequiredMixin, TemplateView):
    
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(*args, **kwargs)
-        items = Part.objects.get(pk=kwargs['part_id']).batch_count 
-        print 'items: {}'.format(items)
+        
+        part = Part.objects.get(pk=kwargs['part_id'])
+        context['part'] = part
+
+        items = part.batch_count
         initial = []
-        for i in range(items):
+        for i in xrange(items):
             initial.append({'part': kwargs['part_id']})
+
         project_id = Order.objects.get(pk=kwargs['order_id']).project_id
         visible = Part.objects.get(pk=kwargs['part_id']).van
+
         BatchUploadFormSet = formset_factory(BatchUploadForm, extra=0, formset=BatchFormSet)
         formset  = BatchUploadFormSet(initial=initial, project_id=project_id, visible=visible)
+
         context['formset'] = formset
+        context['link'] = '/order/{0}/part/{1}/edit'.format(part.order_id, part.id)
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
@@ -134,4 +129,4 @@ class BatchView(LoginRequiredMixin, TemplateView):
             return HttpResponseRedirect('/thanks/')
         else:
             return self.render_to_response(context)
-    
+
