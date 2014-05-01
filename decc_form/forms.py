@@ -3,9 +3,9 @@ from django.forms.formsets import BaseFormSet
 from django.utils.functional import cached_property
 
 from localflavor.us.forms import USStateField
-from localflavor.us.us_states import US_STATES, STATE_CHOICES
+from localflavor.us.us_states import US_STATES
 
-from models import Type, Client, Part, Committee, Project
+from models import Client, Committee, Part, Project, Type
 
 
 class ClientSelectionForm(forms.Form):
@@ -38,7 +38,6 @@ class PartForm(forms.ModelForm):
         self.fields['order'].initial = self.order
         if self.project_id:
             self.fields['form_type'].queryset = Type.objects.filter(project_id=self.project_id)
-        
             
 
 class BatchFormSet(BaseFormSet):
@@ -73,5 +72,3 @@ class BatchUploadForm(forms.Form):
             self.fields['committee'].label = ''
             self.fields['committee'].required=False
             
-
-

@@ -6,15 +6,14 @@ from django.core.mail import send_mail
 from django.forms.formsets import formset_factory
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response
-from django.views.generic import TemplateView, CreateView, DetailView
+from django.views.generic import TemplateView
 
 from braces.views import LoginRequiredMixin
 
-from .models import Order, Part, Client, Type, Batch, Project
+from .models import Batch, Order, Part
 from .forms import ClientSelectionForm, PartForm, BatchUploadForm, BatchFormSet
 
 
-#first arg: LoginRequiredMixin
 class OrderView(LoginRequiredMixin, TemplateView):
     login_url='/users/login'
 
@@ -46,7 +45,6 @@ class OrderView(LoginRequiredMixin, TemplateView):
 
 class PartView(LoginRequiredMixin, TemplateView):
     login_url='/users/login'
-    #form_class = PartForm
 
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(*args, **kwargs)
