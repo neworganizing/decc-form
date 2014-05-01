@@ -1,1 +1,7 @@
-Change decc_form/decc_form/sample_db_config.py to db_config.py and add your values to the variables.
+Add the following details to an email-settings before deploy 
+
+EMAIL_USE_TLS = EMAIL_USE_TLS
+EMAIL_HOST = EMAIL_HOST
+EMAIL_HOST_USER = EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = EMAIL_HOST_PASSWORD
+EMAIL_PORT = EMAIL_PORT
