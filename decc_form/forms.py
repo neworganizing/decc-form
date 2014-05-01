@@ -21,22 +21,6 @@ class ClientSelectionForm(forms.Form):
         self.fields['client'].queryset = queryset
 
 
-class OtherPartForm(forms.Form):
-    state = USStateField(widget=forms.Select(choices=(('', 'Select a State'),)+US_STATES))
-    form_type = forms.ModelChoiceField(queryset=Type.objects.all())  
-    num_items = forms.IntegerField()
-    num_batches = forms.IntegerField()
-    rush = forms.BooleanField(label='Check this box if your order must be rushed', required=False)
-    van = forms.BooleanField(label='VAN Committee?', required=False)
-    quad = forms.BooleanField(label='Quad?', required=False)
-    match = forms.BooleanField(label='Match your data to Catalist etc?', required=False)
-    
-    def __init__(self, *args, **kwargs):
-        self.project_id = kwargs.pop('project_id', None)
-        super(PartForm, self).__init__(*args, **kwargs)
-        if self.project_id:
-            self.fields['form_type'].queryset = Type.objects.filter(project_id=self.project_id)
-
 class PartForm(forms.ModelForm):
     class Meta:
         model = Part    
