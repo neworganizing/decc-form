@@ -31,9 +31,11 @@ class PartForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.project_id = kwargs.pop('project_id', None)
+        self.order = kwargs.pop('order', None)
         super(PartForm, self).__init__(*args, **kwargs)
         self.fields['order'].widget = forms.HiddenInput()
         self.fields['order'].label = ''
+        self.fields['order'].initial = self.order
         if self.project_id:
             self.fields['form_type'].queryset = Type.objects.filter(project_id=self.project_id)
         

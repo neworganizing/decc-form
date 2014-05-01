@@ -16,7 +16,8 @@ from .forms import ClientSelectionForm, PartForm, BatchUploadForm, BatchFormSet
 
 #first arg: LoginRequiredMixin
 class OrderView(LoginRequiredMixin, TemplateView):
-    
+    login_url='/users/login'
+
     def get(self, request, *args, **kwargs):
         context = super(OrderView, self).get_context_data(*args, **kwargs)
         context['form'] = ClientSelectionForm(user=request.user)
@@ -44,7 +45,8 @@ class OrderView(LoginRequiredMixin, TemplateView):
 
 
 class PartView(LoginRequiredMixin, TemplateView):
-    form_class = PartForm
+    login_url='/users/login'
+    #form_class = PartForm
 
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(*args, **kwargs)
@@ -58,7 +60,7 @@ class PartView(LoginRequiredMixin, TemplateView):
             part = Part.objects.get(pk=kwargs['part_id'])
             form = PartForm(instance=part, project_id=order.project_id)
         else:
-            form = PartForm(project_id=order.project_id)
+            form = PartForm(project_id=order.project_id, order=order)
 
         context['form'] = form
         return self.render_to_response(context)
@@ -80,6 +82,7 @@ class PartView(LoginRequiredMixin, TemplateView):
 
 
 class BatchView(LoginRequiredMixin, TemplateView):
+    login_url='/users/login'
    
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(*args, **kwargs)
