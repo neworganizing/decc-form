@@ -140,7 +140,7 @@ class EndView(LoginRequiredMixin, TemplateView):
         order_line = ''
         cost_line = ''
         for p in Part.objects.filter(order=order.id):
-            order_line += '\n\t{0} -- {1} files, {2} records'.format(p.form_type, p.batch_count, p.item_count)
+            order_line += '\n\t{0} -- {1} file(s), {2} record(s)'.format(p.form_type, p.batch_count, p.item_count)
             details = '\n\tDetails:\n\t\tRush? {0}\n\t\tVan Committees? {1}\n\t\tQuad? {2}\n\t\tVendor Matching? {3}\n'.format(p.rush, p.van, p.quad, p.match)
             order_line += details
             total_bc += p.batch_count
@@ -152,7 +152,7 @@ class EndView(LoginRequiredMixin, TemplateView):
         message += '\n\nEstimated cost for this order is:\n'
         message += cost_line
         message += '\n\tTotal -- ${0}\n\n'.format(total_cost)
-        message += 'We\'ll let you know when we have the data back and complete our quality checks. Send any questions our way.\n\nThank you,'
+        message += 'We\'ll let you know when we have the data back and complete our quality checks. Send any questions our way.\n\nThank you,\nDECC Team'
         return message
 
     def post(self, request, *args, **kwargs):
@@ -164,7 +164,7 @@ class EndView(LoginRequiredMixin, TemplateView):
             message = self.write_email(kwargs['order_id'])
             print message
             from_email = settings.EMAIL_HOST_USER
-            to_list = [request.user.email] #decc@neworganizing.com
+            to_list = [request.user.email, 'decc@neworganizing.com']
             send_mail(subject, message, from_email, to_list, fail_silently=True)
             return HttpResponseRedirect('/thanks/')
 
