@@ -112,7 +112,6 @@ class BatchView(LoginRequiredMixin, TemplateView):
         
         if formset.is_valid():
             for form in formset:
-                print 'form'
                 part = Part.objects.get(pk=form.cleaned_data['part'])
                 client_filename = form.cleaned_data['client_filename']
                 item_count = form.cleaned_data['item_count']
@@ -157,12 +156,12 @@ class EndView(LoginRequiredMixin, TemplateView):
 
     def post(self, request, *args, **kwargs):
         context = super(EndView, self).get_context_data(*args, **kwargs)
+
         if 'add' in request.POST:
             return HttpResponseRedirect('/order/{0}/part/'.format(kwargs['order_id']))
         elif 'complete' in request.POST:
             subject = 'Thank you for your DECC Order!'
             message = self.write_email(kwargs['order_id'])
-            print message
             from_email = settings.EMAIL_HOST_USER
             to_list = [request.user.email, 'decc@neworganizing.com']
             send_mail(subject, message, from_email, to_list, fail_silently=True)
