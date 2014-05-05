@@ -5,6 +5,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     
+    url(r'^order/(?P<order_id>[0-9]+)/part/(?P<part_id>[0-9]+)/end/$', views.EndView.as_view(template_name='decc_form/end_form.html'), name='end'),
     url(r'^order/(?P<order_id>[0-9]+)/part/(?P<part_id>[0-9]+)/batch/$', views.BatchView.as_view(template_name='decc_form/batch_form.html'), name='batch'),
     url(r'^order/(?P<order_id>[0-9]+)/part/$', views.PartView.as_view(template_name='decc_form/part_form.html'), name='part'),
     url(r'^order/(?P<order_id>[0-9]+)/part/(?P<part_id>[0-9]+)/(?P<edit>)edit/$', views.PartView.as_view(template_name='decc_form/part_form.html'), name='part'),

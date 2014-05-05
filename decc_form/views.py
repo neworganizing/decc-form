@@ -11,7 +11,7 @@ from django.views.generic import TemplateView
 from braces.views import LoginRequiredMixin
 
 from .models import Batch, Order, Part
-from .forms import ClientSelectionForm, PartForm, BatchUploadForm, BatchFormSet
+from .forms import ClientSelectionForm, PartForm, BatchUploadForm, BatchFormSet 
 
 
 class OrderView(LoginRequiredMixin, TemplateView):
@@ -81,7 +81,7 @@ class PartView(LoginRequiredMixin, TemplateView):
 
 class BatchView(LoginRequiredMixin, TemplateView):
     login_url='/users/login'
-   
+    
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(*args, **kwargs)
         
@@ -122,12 +122,51 @@ class BatchView(LoginRequiredMixin, TemplateView):
                     pass
                 batch = Batch(part=part, client_filename=client_filename, item_count=item_count, committee=committee)
                 batch.save()
-                subject = 'Thank you for your DECC Order!'
-                message = 'TEST MESSAGE'
-                from_email = settings.EMAIL_HOST_USER
-                to_list = [request.user.email] #decc@neworganizing.com
-                send_mail(subject, message, from_email, to_list, fail_silently=True)
-            return HttpResponseRedirect('/thanks/')
+                return HttpResponseRedirect('/order/{0}/part/{1}/end/'.format(kwargs['order_id'], kwargs['part_id']))
         else:
             return self.render_to_response(context)
 
+class EndView(LoginRequiredMixin, TemplateView):
+    login_url='/users/login'
+    
+    def write_email(self, order_id):
+        message = ''
+        order = Order.objects.get(pk=order_id)
+        date = '{}-{}-{}'.format(order.order_date.month, order.order_date.day, order.order_date.year)
+        message += 'Hello,\n\nHope you are well. We are processing your order dated {0}, so we just wanted to confirm the details of this order.\n\n{0} Order:\n'.format(date)
+        total_bc = 0
+        total_ic = 0
+        total_cost = 0
+        order_line = ''
+        cost_line = ''
+        for p in Part.objects.filter(order=order.id):
+            order_line += '\n\t{0} -- {1} files, {2} records'.format(p.form_type, p.batch_count, p.item_count)
+            details = '\n\tDetails:\n\t\tRush? {0}\n\t\tVan Committees? {1}\n\t\tQuad? {2}\n\t\tVendor Matching? {3}\n'.format(p.rush, p.van, p.quad, p.match)
+            order_line += details
+            total_bc += p.batch_count
+            total_ic += p.item_count
+            cost_line += '\n\t{0} -- {1} x {2}/unit = ${3}'.format(p.form_type, p.item_count, p.form_type.cost_rate, (p.item_count*p.form_type.cost_rate))
+            total_cost += p.item_count*p.form_type.cost_rate
+        message += order_line
+        message += '\n\tTotal -- {0} file(s), {1} record(s)'.format(total_bc, total_ic)
+        message += '\n\nEstimated cost for this order is:\n'
+        message += cost_line
+        message += '\n\tTotal -- ${0}\n\n'.format(total_cost)
+        message += 'We\'ll let you know when we have the data back and complete our quality checks. Send any questions our way.\n\nThank you,'
+        return message
+
+    def post(self, request, *args, **kwargs):
+        context = super(EndView, self).get_context_data(*args, **kwargs)
+        if 'add' in request.POST:
+            return HttpResponseRedirect('/order/{0}/part/'.format(kwargs['order_id']))
+        elif 'complete' in request.POST:
+            subject = 'Thank you for your DECC Order!'
+            message = self.write_email(kwargs['order_id'])
+            print message
+            from_email = settings.EMAIL_HOST_USER
+            to_list = [request.user.email] #decc@neworganizing.com
+            send_mail(subject, message, from_email, to_list, fail_silently=True)
+            return HttpResponseRedirect('/thanks/')
+
+        return self.render_to_response(context)
+        

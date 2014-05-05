@@ -72,3 +72,4 @@ class BatchUploadForm(forms.Form):
             self.fields['committee'].label = ''
             self.fields['committee'].required=False
             
+

@@ -1,0 +1,9 @@
+{% extends "decc_form/decc_base.html" %}
+{% block title %} DECC - Complete Order{% endblock %}
+{% block content %}
+<form action="" method="POST">
+  {% csrf_token %}
+  <p><input type="submit" name="add" value="Add another Part"/></p>
+  <p><input type="submit" name="complete" value="Complete Order"/></p>
+</form>
+{% endblock %}
