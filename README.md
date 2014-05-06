@@ -5,47 +5,55 @@
 ##Overview
 
 ##Models
-MyModel- Has my data
-func() - does stuff
 
 **Address**
+
 Contains general address information
 
 **Contact**
+
 Links to the Django auth_user, where name, email and pw are stored
 Contains supplemental user data
 
 **Billable**
+
 Includes references to Contact, Address
 Provides tax status for the partner org
 
 **Project**
+
 Project is the top level representation of a DECC order
 Represented by start and end dates
 References Billable
 
 **Client**
+
 Represents the actual DECC client (read: organization)
 References a single, specific Project
 
 **ClientContact**
+
 Clients have a first contact and a second contact, ranked according to priority
 Contacts may belong to multiple organizations 
 
 **Type**
+
 Projects have different types associated with them (eg. Voter Registration Card)
 Each type of processing has costs associated with it
 cost_rate is the cost charged to the client, cost_noi is the charge to NOI from the vendor
 
 **Committee**
+
 Represents an organization in VAN that a project may be associated with 
 
 **Order**
+
 References Project
 One level below Project, Order is the first thing created with the web form
 It mostly just represents the dates associated with the order
 
 **Part**
+
 References Order
 Each order may have multiple associated Parts
 Part contains the important details about the order
@@ -63,6 +71,7 @@ Clients can specify the following:
 
 
 **Batch**
+
 References Part
 Each part may have multiple associated Batches
 These are the actual file uploads with the data that will be processed
@@ -73,10 +82,12 @@ If `van` is true in the Batch's Part, the specific committee will be chosen here
 `vendor_filename` is a 10 digit value calculated based on the 3 digit Client id and a 7 digit batch id. The batch id is incrememted each time a new batch is uploaded to the Project. The `id` is the `vendor_filename` without the .pdf extension and cast to an integer (which means that the prepended 0s will be gone).
 
 **Registrant**
+
 This model contains all the data that is actually found on the cards/forms in the batches
 Formatting may be inconsistent, so all fields are chars and null
 
 **RegistrantAddress**
+
 ManyToMany field allowing one address model to be used for the various needs throughout this database
 
 ##Views
