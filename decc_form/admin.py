@@ -25,7 +25,7 @@ class AddressAdmin(admin.ModelAdmin):
     ordering = ('state',)
 
 class ProjectAdmin(admin.ModelAdmin):
-    fields = ['start_date', 'end_date', 'estimated_item_count', 'notes']
+    fields = ['billable', 'start_date', 'end_date', 'estimated_item_count', 'notes']
     list_display = ['id', 'start_date', 'end_date']
 
     
