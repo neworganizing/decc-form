@@ -23,7 +23,6 @@ class AddressAdmin(admin.ModelAdmin):
     fields = ['street1', 'street2', 'city', 'state', 'zipcode']
     list_display = ('id', 'street1', 'street2', 'city', 'state', 'zipcode')
     ordering = ('state',)
-    
 
 class ProjectAdmin(admin.ModelAdmin):
     fields = ['start_date', 'end_date', 'estimated_item_count', 'notes']
@@ -64,6 +63,11 @@ class BatchAdmin(admin.ModelAdmin):
 class RegistrantAdmin(admin.ModelAdmin):
     exclude = ['id']
 
+class BillableAdmin(admin.ModelAdmin):
+    fields = ['contact', 'address', 'tax_status']
+    list_display = ['contact', 'address', 'tax_status']
+
+admin.site.register(Billable, BillableAdmin)
 admin.site.register(Client, ClientAdmin)
 admin.site.register(Contact, ContactAdmin)
 admin.site.register(Address, AddressAdmin)
