@@ -8,10 +8,16 @@ class ContactAdmin(admin.ModelAdmin):
     list_display = ('user',)
     ordering = ('user',)
 
+class ContactInline(admin.StackedInline):
+    model = Contact
+    extra = 0
+
 class ClientAdmin(admin.ModelAdmin):
     fields = ('address', 'project', 'contacts', 'org_name',)
     list_display = ('org_name', 'project', 'address',)
     ordering = ('org_name',)
+
+    inlines = [ContactInline,]
 
 class AddressAdmin(admin.ModelAdmin):
     fields = ['street1', 'street2', 'city', 'state', 'zipcode']
