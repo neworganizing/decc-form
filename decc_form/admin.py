@@ -8,6 +8,11 @@ class ContactAdmin(admin.ModelAdmin):
     list_display = ('user',)
     ordering = ('user',)
 
+class ClientAdmin(admin.ModelAdmin):
+    fields = ('address', 'project', 'contacts', 'org_name',)
+    list_display = ('org_name', 'project', 'address',)
+    ordering = ('org_name',)
+
 class AddressAdmin(admin.ModelAdmin):
     fields = ['street1', 'street2', 'city', 'state', 'zipcode']
     list_display = ('id', 'street1', 'street2', 'city', 'state', 'zipcode')
@@ -53,6 +58,7 @@ class BatchAdmin(admin.ModelAdmin):
 class RegistrantAdmin(admin.ModelAdmin):
     exclude = ['id']
 
+admin.site.register(Client, ClientAdmin)
 admin.site.register(Contact, ContactAdmin)
 admin.site.register(Address, AddressAdmin)
 admin.site.register(Project, ProjectAdmin)
