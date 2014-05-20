@@ -128,7 +128,13 @@ class BatchView(LoginRequiredMixin, TemplateView):
 
 class EndView(LoginRequiredMixin, TemplateView):
     login_url='/users/login'
-    
+
+    def yesno(self, bool_word):
+        if bool_word == False:
+            return 'No'
+        else:
+            return 'Yes'
+
     def write_email(self, order_id):
         message = ''
         order = Order.objects.get(pk=order_id)
@@ -141,7 +147,7 @@ class EndView(LoginRequiredMixin, TemplateView):
         cost_line = ''
         for p in Part.objects.filter(order=order.id):
             order_line += '\n\t{0} -- {1} file(s), {2} record(s)'.format(p.form_type, p.batch_count, p.item_count)
-            details = '\n\tDetails:\n\t\tRush? {0}\n\t\tVan Committees? {1}\n\t\tQuad? {2}\n\t\tVendor Matching? {3}\n'.format(p.rush, p.van, p.quad, p.match)
+            details = '\n\tDetails:\n\t\tRush? {0}\n\t\tVan Committees? {1}\n\t\tQuad? {2}\n\t\tVendor Matching? {3}\n'.format(self.yesno(p.rush), self.yesno(p.van), self.yesno(p.quad), self.yesno(p.match))
             order_line += details
             total_bc += p.batch_count
             total_ic += p.item_count

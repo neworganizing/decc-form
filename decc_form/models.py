@@ -119,6 +119,7 @@ class Batch(models.Model):
     client_filename = models.FileField(upload_to='batchfiles/')
     vendor_filename = models.CharField(max_length=255)
     item_count = models.IntegerField()
+    final_item_count = models.IntegerField(null=True, blank=True)
     submission_date = models.DateField()
     processed_date = models.DateField(null=True, blank=True)
     return_date = models.DateField(null=True, blank=True)
