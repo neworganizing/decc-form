@@ -98,7 +98,8 @@ class BatchView(LoginRequiredMixin, TemplateView):
 
         BatchUploadFormSet = formset_factory(BatchUploadForm, extra=0, formset=BatchFormSet)
         formset  = BatchUploadFormSet(initial=initial, project_id=project_id, visible=visible)
-
+        for form in formset: 
+            print form.data
         context['formset'] = formset
         context['link'] = '/order/{0}/part/{1}/edit'.format(part.order_id, part.id)
         return self.render_to_response(context)
@@ -165,7 +166,7 @@ class EndView(LoginRequiredMixin, TemplateView):
             from_email = settings.EMAIL_HOST_USER
             to_list = [request.user.email, 'decc@neworganizing.com']
             send_mail(subject, message, from_email, to_list, fail_silently=True)
-            return HttpResponseRedirect('/thanks/')
+            return HttpResponseRedirect('/')
 
         return self.render_to_response(context)
         

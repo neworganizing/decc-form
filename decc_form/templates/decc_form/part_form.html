@@ -1,16 +1,18 @@
 {% extends "decc_form/decc_base.html" %}
 {% block title %}DECC - Order Details{% endblock %}
 {% block content %}
-{% if user.is_authenticated %}
-    <p>Welcome, {{ user.username }}. Thanks for logging in.</p>
-{% else %}
-    <p>Welcome, new user. Please log in.</p>
-{% endif %}
 <form action="" method="POST">
   {% csrf_token %}
-  {% for field in form %}
-  <p>{{field.label}} {{ field }} {{field.errors}}</p>
-  {% endfor %}
-  <button type="submit">Upload PDFs&raquo</button>
+  {{form.order}}
+  <h1>Before you upload your files, we need some information about what's in this order. Please fill in the information below to continue.</h1>
+  <p><strong>What type of forms are in this order?</strong><br/>(e.g. Voter Registration, Pledge Card)<br/>{{form.form_type}} {{form.form_type.errors}}</p>
+  <p><strong>If these are Voter Registration forms, what state were they collected in?</strong><br/>{{form.state}} {{form.state.errors}}</p>
+  <p><strong>How many total forms are in this order?</strong><br/>Please include only forms of this type (and state, if applicable)<br/>{{form.item_count}} {{form.item_count.errors}}</p>
+  <p><strong>How many batches will be in this order?</strong><br/>Some groups separate their order into different batches (e.g. by location or organizer) to better track their program. If you are not separating your order into batches, enter "1". You will prompted to enter information about each of the batches on the next page.<br/>{{form.batch_count}} {{form.batch_count.errors}}</p>
+  <p><strong>Is this a rush order?</strong> {{form.rush}} {{form.rush.errors}}<br/>Standard orders will be returned within ten business days maximum. Rush orders can be returned within 5 business days or less. Check this box if you would like your order to be handled as a rush order. (Additional fees apply).</p>
+  <p><strong>Do you want this information entered into the VAN?</strong> {{form.van}} {{form.van.errors}}<br/>Check this box if you would like DECC to upload your data into the VAN for you. If this box is checked, the next page will ask you for information about which VAN committees each batch should be uploaded to. If you are not a VAN client, or if you want to upload this data to VAN yourself, all data will be returned in CSV format.</p>
+  <p><strong>Would you like this information matched to your voter file vendor?</strong> {{form.match}} {{form.match.errors}}<br/>If you are the client of a commercial voter file vendor, and would like this information to be matched to this voter file (separately from VAN), check this box and we will follow up with you.</p>
+  <p><strong>Share counts with the Quad?</strong> {{form.quad}} {{form.quad.errors}}<br/>Check this box if you would like these counts to be shared to the Quad.</p>
+  <button type="submit">Continue to file upload &raquo</button>
 </form>
 {% endblock %}

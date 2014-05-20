@@ -1,9 +1,10 @@
 {% extends "decc_form/decc_base.html" %}
 {% block title %} DECC - Upload PDFs{% endblock %}
 {% block content %}
-<form enctype="multipart/form-data" action="" method="POST">
-  {% csrf_token %}
-  <p><button type="button" value="edit"><a href={{ link }}>&laquo Edit your order details</a></button></p>
+<form action="{{ link }}" method="link">
+  <p><button type="submit" value="edit">&laquo Edit your order details</button></p>
+</form>
+
   <p> Order details:</br>
     State: {{ part.state }}</br>
     Form Type: {{ part.form_type }}</br>
@@ -14,19 +15,23 @@
     Match? {{ part.match }}</br>
   </p>
 
+<form enctype="multipart/form-data" action="" method="POST">
+  {% csrf_token %}
   {{ formset.management_form }}
   {% for form in formset %}
-  {{ form.part }}
-  <p>{{ form.item_count.label }}: {{ form.item_count }} {{ form.item_count.errors }}</p>
-  
-  <p>{{form.committee.label }}{{ form.committee }} {{ form.committee.errors }}</p>
-  <p>{{ form.client_filename.label_tag }}</p>
-  <p>
-    {{ form.client_filename.errors }}
-    {{ form.client_filename }}
-  </p>
+  <div class="batch">
+    {{ form.part }}
+    <p>How many forms are in this batch? {{ form.item_count }} {{ form.item_count.errors }}</p>
+    
+    <p>{{form.committee.label}} {{ form.committee }} {{ form.committee.errors }}</p>
+    <p>Each file’s name will be used to name its batch. If you want the data tagged with specific information such as the collection location or organizer name, please name the files accordingly.<p>
+    <p>Upload batch file here: 
+      {{ form.client_filename.errors }}
+      {{ form.client_filename }}
+    </p>
+  </div>
   {% endfor %}
-  <p>Once you push this button you can never ever ever go back. Think about your choices. All of them. If you're cool with it, click away!</p>
+  <p class="doom">Note: once you upload the files, you cannot start over.<br/> Please confirm that these are the files you want to submit for data entry.</p>
   <p><button type="submit" value="Upload">Upload files</button></p>
 </form>
 {% endblock %}

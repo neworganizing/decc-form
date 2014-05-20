@@ -67,6 +67,7 @@ class BatchUploadForm(forms.Form):
         super(BatchUploadForm, self).__init__(*args, **kwargs)
         if self.visible:
             self.fields['committee'].queryset = self.queryset
+            self.fields['committee'].label = 'If applicable, please select your VAN Committee for uploading this data:'
         else:
             self.fields['committee'].widget=forms.HiddenInput()
             self.fields['committee'].label = ''

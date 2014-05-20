@@ -1,9 +1,18 @@
 {% extends "decc_form/decc_base.html" %}
 {% block title %} DECC - Complete Order{% endblock %}
 {% block content %}
-<form action="" method="POST">
-  {% csrf_token %}
-  <p><input type="submit" name="add" value="Add another Part"/></p>
-  <p><input type="submit" name="complete" value="Complete Order"/></p>
-</form>
+<div class="last-page">
+  <form action="" method="POST">
+    {% csrf_token %}
+    {% if user.is_authenticated %}
+    <h1>Thank you for your order, {{user.username}}!</h1>
+    {% endif %}
+    <p>You should receive an email shortly with an order summary and an estimated cost for this order. If you have any questions, or need to alert us to any changes or corrections, you can contact us at <a id="email" href="mailto:data@neworganizing.com">data@neworganizing.com</a>.</p>
+    <br/>
+    <h2>To create another order, click here:</h2>
+    <p><button class="final" type="submit" name="add" value="more">Add another order</button></p>
+    <h2>Otherwise, we will be in touch as soon as your order is ready!</h2>
+    <p><button class="final" type="submit" name="complete" value="end">Complete your order</button></p>
+  </form>
+</div>
 {% endblock %}

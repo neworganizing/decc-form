@@ -2,8 +2,13 @@
 <html>
   <head>
     <title>{% block title %}{% endblock%}</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/decc.css">
   </head>
   <body>
+    <div class="sidebar">
+      <img src="/static/images/decc-logo-right_1000x545.png">
+    </div>
+    <div class="message">
     {% if messages %}
     <ul class="messgaes">
       {% for message in messages %}
@@ -15,6 +20,11 @@
       {% endfor %}
     </ul>
     {% endif %}
-    {% block content %}{% endblock %}
+    </div>
+    <div class="content">
+      <div class="form">
+	{% block content %}{% endblock %}
+      </div>
+    </div>
   </body>
 </html>

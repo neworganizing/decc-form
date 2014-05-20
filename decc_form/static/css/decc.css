@@ -1,8 +1,19 @@
 html {
     font-family: sans-serif;
+    margin: 0;
+    height: 100%;
+}
+body {
+    min-height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
 }
 a {
     text-decoration: none;
+}
+p #email{
+    color: #049f9f;
 }
 a:link {
     color: #000;
@@ -13,49 +24,81 @@ a:visited {
 a:hover {
     color: #049f9f;
 }
-div.logo img {
+h1 {
+    font-size: 130%;
+}
+h2 {
+    font-size: 120%;
+}
+.doom {
+    color: red;
+}
+.logo img {
     display: block;
     margin: auto;
 }
-div.logo p {
+.logo p {
     text-align: center;
     font-size: 140%;
     margin-top: -40px;
     color: #000;
     padding-bottom: 300px;
 }
-div.home-footer p {
+.home-footer p {
     text-align: center;
     font-size: 70%;
     padding-bottom: 20px;
     color: #049f9f;
 }
-div.sidebar {
-    margin: -8px, 0px, -8px, -8px;
+.sidebar {
     float: left;
     clear: left;
     width: 40%;
 }
-div.sidebar img {
-    float: left; 
+.sidebar img {
+    /*height: 800px;
+    width: 436px;*/
     overflow: hidden;
 }
-div.content {
+.content {
     float: right;
+    clear: right;
     width: 60%;
+}
+.form {
+    padding-top: 50px;
+    width: 60%;
+    margin: 0 auto;
+    text-align: left;
+}
+.welcome {
+    padding-bottom: 30px;
+}
+button a{
+    text-color: #fff;
+}
+button { 
+ 
+    border: 0;
+    padding: 10px;
+    border-radius: 8px;
+    text-decoration: none;
+    background-color: #049494;
+    color: #fff;
+    font-size: 18px;
+}
+button:hover {
+    background-color: #68C5C5;
+}
+button.final {
+    border-top: 400px;
+    margin: 0, auto;
+    padding-left: 60px;
+    padding-right: 60px;
+}
+.last-page {
+    padding-top: 140px;
     text-align: center;
+    width: 80%;
 }
-div.deccform {
-
-}
-div.page-footer {
-    text-align: center;
-    padding-top: 1000px;
-}
-div.page-footer p {
-    text-align: center;
-    font-size: 70%;
-    padding-bottom: 20px;
-    color: #049f9f;
-}
-
+    
