@@ -8,19 +8,24 @@ class ContactAdmin(admin.ModelAdmin):
     list_display = ('user',)
     ordering = ('user',)
 
+class ContactInline(admin.TabularInline):
+    model = ClientContact
+    extra = 0
+
 class ClientAdmin(admin.ModelAdmin):
-    fields = ('address', 'project', 'contacts', 'org_name',)
+    fields = ('address', 'project', 'org_name',)
     list_display = ('org_name', 'project', 'address',)
     ordering = ('org_name',)
+
+    inlines = [ContactInline,]
 
 class AddressAdmin(admin.ModelAdmin):
     fields = ['street1', 'street2', 'city', 'state', 'zipcode']
     list_display = ('id', 'street1', 'street2', 'city', 'state', 'zipcode')
     ordering = ('state',)
-    
 
 class ProjectAdmin(admin.ModelAdmin):
-    fields = ['start_date', 'end_date', 'estimated_item_count', 'notes']
+    fields = ['billable', 'start_date', 'end_date', 'estimated_item_count', 'notes', 'order_frequency']
     list_display = ['id', 'start_date', 'end_date']
 
     
@@ -58,6 +63,11 @@ class BatchAdmin(admin.ModelAdmin):
 class RegistrantAdmin(admin.ModelAdmin):
     exclude = ['id']
 
+class BillableAdmin(admin.ModelAdmin):
+    fields = ['contact', 'address', 'tax_status']
+    list_display = ['contact', 'address', 'tax_status']
+
+admin.site.register(Billable, BillableAdmin)
 admin.site.register(Client, ClientAdmin)
 admin.site.register(Contact, ContactAdmin)
 admin.site.register(Address, AddressAdmin)
