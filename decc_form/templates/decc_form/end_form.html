@@ -5,7 +5,7 @@
   <form action="" method="POST">
     {% csrf_token %}
     {% if user.is_authenticated %}
-    <h1>Thank you for your order, {{user.username}}!</h1>
+    <h1>Thank you for your order, {{user.first_name}}!</h1>
     {% endif %}
     <p>You should receive an email shortly with an order summary and an estimated cost for this order. If you have any questions, or need to alert us to any changes or corrections, you can contact us at <a id="email" href="mailto:data@neworganizing.com">data@neworganizing.com</a>.</p>
     <br/>

@@ -3,7 +3,7 @@
 {% block content %}
 <div class="welcome">
   {% if user.is_authenticated %}
-  <p>Welcome, {{ user.username }}!<br/><br/>
+  <p>Welcome, {{ user.first_name }}!<br/><br/>
     Thank you for using DECC data entry service. This is the client intake form. Here you can upload scanned forms to submit to DECC for data entry. Please select your organization name below and click the “start new order” button to continue. <br/></br>
     You’ll need to create a separate order for each state and form type. Voter registration forms and pledge cards should be submitted separately, for instance. If you have questions or difficulty, email us at <a id="email" href="mailto:data@neworganizing.com">data@neworganizing.com.</a> </p>
   {% endif %}
