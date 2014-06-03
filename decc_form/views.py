@@ -81,12 +81,21 @@ class PartView(LoginRequiredMixin, TemplateView):
 
 class BatchView(LoginRequiredMixin, TemplateView):
     login_url='/users/login'
-    
+    def yesno(self, bool_word):
+        if bool_word == False:
+            return 'No'
+        else:
+            return 'Yes'
+
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(*args, **kwargs)
         
-        part = Part.objects.get(pk=kwargs['part_id'])
+        part = Part.objects.get(pk=kwargs['part_id'])        
         context['part'] = part
+        context['partdotrush'] = self.yesno(part.rush)
+        context['partdotvan'] = self.yesno(part.van)
+        context['partdotquad'] = self.yesno(part.quad)
+        context['partdotmatch'] = self.yesno(part.match)
 
         items = part.batch_count
         initial = []
@@ -128,7 +137,7 @@ class BatchView(LoginRequiredMixin, TemplateView):
 
 class EndView(LoginRequiredMixin, TemplateView):
     login_url='/users/login'
-
+    
     def yesno(self, bool_word):
         if bool_word == False:
             return 'No'
@@ -139,7 +148,7 @@ class EndView(LoginRequiredMixin, TemplateView):
         message = ''
         order = Order.objects.get(pk=order_id)
         date = '{}-{}-{}'.format(order.order_date.month, order.order_date.day, order.order_date.year)
-        message += 'Hello,\n\nHope you are well. We are processing your order dated {0}, so we just wanted to confirm the details of this order.\n\n{0} Order:\n'.format(date)
+        message += 'Hello,\n\nHope you are well. We are processing your order dated {0}, so we just wanted to confirm the details of thiS order.\n\n{0} Order:\n'.format(date)
         total_bc = 0
         total_ic = 0
         total_cost = 0
