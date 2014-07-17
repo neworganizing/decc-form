@@ -148,7 +148,7 @@ class EndView(LoginRequiredMixin, TemplateView):
         message = ''
         order = Order.objects.get(pk=order_id)
         date = '{}-{}-{}'.format(order.order_date.month, order.order_date.day, order.order_date.year)
-        message += 'Hello,\n\nHope you are well. We are processing your order dated {0}, so we just wanted to confirm the details of thiS order.\n\n{0} Order:\n'.format(date)
+        message += 'Hello,\n\nHope you are well. We are processing your order dated {0}, so we just wanted to confirm the details of this order.\n\n{0} Order:\n'.format(date)
         total_bc = 0
         total_ic = 0
         total_cost = 0
@@ -176,7 +176,9 @@ class EndView(LoginRequiredMixin, TemplateView):
         if 'add' in request.POST:
             return HttpResponseRedirect('/order/{0}/part/'.format(kwargs['order_id']))
         elif 'complete' in request.POST:
-            subject = 'Thank you for your DECC Order!'
+            order = Order.objects.get(pk=kwargs['order_id'])
+            date = '{}-{}-{}'.format(order.order_date.month, order.order_date.day, order.order_date.year)
+            subject = 'DECC Order {}'.format(date)
             message = self.write_email(kwargs['order_id'])
             from_email = 'data@neworganizing.com'
             to_list = [request.user.email, 'decc@neworganizing.com']

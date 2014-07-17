@@ -26,6 +26,9 @@ class Contact(models.Model):
     added_date = models.DateField(auto_now_add=True)
     modified_date = models.DateField(auto_now=True)
 
+    def __unicode__(self):
+        return str(self.user.first_name + ' ' + self.user.last_name)
+
 
 class Billable(models.Model):
     contact = models.ForeignKey(Contact)
@@ -35,7 +38,10 @@ class Billable(models.Model):
     added_date = models.DateField(auto_now_add=True)
     modified_date = models.DateField(auto_now=True)
 
-   
+    def __unicode__(self):
+        return str(self.org_name)
+
+
 class Project(models.Model):
     #client = models.ForeignKey(Client)
     billable = models.ForeignKey(Billable)
@@ -88,6 +94,7 @@ class Committee(models.Model):
     def __unicode__(self):
         return str(self.name)
 
+
 class Order(models.Model):
     project = models.ForeignKey(Project)
     order_date = models.DateField(default=datetime.datetime.today())
@@ -95,6 +102,9 @@ class Order(models.Model):
     bill_date = models.DateField(null=True, blank=True)
     paid_date = models.DateField(null=True, blank=True)
     
+    def __unicode__(self):
+        return str('{}: {}'.format(self.id, self.order_date))
+
 
 class Part(models.Model):
     order = models.ForeignKey(Order)
