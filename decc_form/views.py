@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.core.mail import send_mail
 from django.forms.formsets import formset_factory
 from django.http import HttpResponseRedirect, Http404
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response 
 from django.views.generic import TemplateView
 
 from braces.views import LoginRequiredMixin
