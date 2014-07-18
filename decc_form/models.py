@@ -27,7 +27,7 @@ class Contact(models.Model):
     modified_date = models.DateField(auto_now=True)
 
     def __unicode__(self):
-        return str(self.user.first_name + ' ' + self.user.last_name)
+        return str(self.user)
 
 
 class Billable(models.Model):
