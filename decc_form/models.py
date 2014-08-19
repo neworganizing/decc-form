@@ -40,7 +40,7 @@ class Billable(models.Model):
 
     def __unicode__(self):
         return str(self.org_name)
-
+        
 
 class Project(models.Model):
     #client = models.ForeignKey(Client)

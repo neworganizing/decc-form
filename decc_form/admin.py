@@ -64,8 +64,8 @@ class RegistrantAdmin(admin.ModelAdmin):
     exclude = ['id']
 
 class BillableAdmin(admin.ModelAdmin):
-    fields = ['contact', 'address', 'tax_status']
-    list_display = ['contact', 'address', 'tax_status']
+    fields = ['contact', 'org_name', 'address', 'tax_status']
+    list_display = ['contact', 'org_name', 'address', 'tax_status']
 
 admin.site.register(Billable, BillableAdmin)
 admin.site.register(Client, ClientAdmin)
