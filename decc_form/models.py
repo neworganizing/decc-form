@@ -12,7 +12,7 @@ class Address(models.Model):
     zipcode = models.CharField(max_length=32, null=True, blank=True)
 
     def __unicode__(self):
-        return str(self.street1 + self.city +','+self.state)
+        return u"{0} {1}, {2}".format(self.street1, self.city, self.state)
 
 
 class Contact(models.Model):
@@ -27,7 +27,7 @@ class Contact(models.Model):
     modified_date = models.DateField(auto_now=True)
 
     def __unicode__(self):
-        return str(self.user)
+        return self.user.__unicode__()
 
 
 class Billable(models.Model):
@@ -39,7 +39,7 @@ class Billable(models.Model):
     modified_date = models.DateField(auto_now=True)
 
     def __unicode__(self):
-        return str(self.org_name)
+        return self.org_name
         
 
 class Project(models.Model):
@@ -55,7 +55,7 @@ class Project(models.Model):
     modified_date = models.DateField(auto_now=True)
    
     def __unicode__(self):
-        return str('{}: {} - {}'.format(self.id, self.start_date, self.end_date))
+        return u'{}: {} - {}'.format(self.id, self.start_date, self.end_date)
 
 
 class Client(models.Model):
@@ -67,7 +67,7 @@ class Client(models.Model):
     modified_date = models.DateTimeField(auto_now=True)
        
     def __unicode__(self):
-        return str(self.org_name)
+        return self.org_name
 
 
 class ClientContact(models.Model):
@@ -84,7 +84,7 @@ class Type(models.Model):
     cost_noi = models.DecimalField(max_digits=5, decimal_places=3)
 
     def __unicode__(self):
-        return str(self.type_name)
+        return self.type_name
 
 
 class Committee(models.Model):
@@ -92,7 +92,7 @@ class Committee(models.Model):
     projects = models.ManyToManyField(Project)
 
     def __unicode__(self):
-        return str(self.name)
+        return self.name
 
 
 class Order(models.Model):
@@ -103,7 +103,7 @@ class Order(models.Model):
     paid_date = models.DateField(null=True, blank=True)
     
     def __unicode__(self):
-        return str('{}: {}'.format(self.id, self.order_date))
+        return u'{}: {}'.format(self.id, self.order_date)
 
 
 class Part(models.Model):
@@ -121,14 +121,17 @@ class Part(models.Model):
     extras = models.CharField(max_length=255, null=True, blank=True)
 
     def __unicode__(self):
-        return str('{}: {}'.format(self.id, self.state))
+        return u'{}: {}'.format(self.id, self.state)
+
+def format_filename(instance, filename):
+    return '/'.join(['batchfiles', instance.calculate_id()+'.pdf'])
 
 class Batch(models.Model):
     #PK = 3 digit client_id, 7 digit batch_id, based on last batch from that project
     id = models.PositiveIntegerField(primary_key=True)
     part = models.ForeignKey(Part) 
     committee = models.ForeignKey(Committee, null=True, blank=True)
-    client_filename = models.FileField(upload_to='batchfiles/')
+    client_filename = models.FileField(upload_to=format_filename)
     vendor_filename = models.CharField(max_length=255)
     item_count = models.IntegerField(null=True, blank=True)
     final_item_count = models.IntegerField(null=True, blank=True)
@@ -138,21 +141,24 @@ class Batch(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.pk:
-            proj_id = self.part.order.project.id
-            c_id = str(Client.objects.get(project=proj_id).id)
-            print 'c_id: {}'.format(c_id)
-            while len(c_id) < 3:
-                c_id = '0' + c_id
-            try:
-                b_id = str(Batch.objects.filter(id__startswith=int(c_id)).order_by('-id')[0].id + 1)[-7:] 
-            except (Batch.DoesNotExist, IndexError) as e:
-                b_id = str(1)
-            while len(b_id) < 7:
-                b_id = '0' + b_id
-            self.vendor_filename = c_id + b_id + '.pdf'
-            self.id = int(c_id + b_id)
+            computed_id = self.calculate_id()
+            self.vendor_filename = computed_id + '.pdf'
+            self.id = int(computed_id)
             self.submission_date = datetime.datetime.today()
         super(Batch, self).save(*args, **kwargs)
+
+    def calculate_id(self):
+        proj_id = self.part.order.project.id
+        c_id = str(Client.objects.get(project=proj_id).id).zfill(3)
+        
+        try:
+            b_id = str(Batch.objects.filter(id__startswith=int(c_id)).order_by('-id')[0].id + 1)[-7:] 
+        except (Batch.DoesNotExist, IndexError) as e:
+            b_id = str(1)
+        
+        b_id = b_id.zfill(7)
+
+        return c_id + b_id
 
 
 class Registrant(models.Model):
