@@ -54,7 +54,8 @@ class PartAdmin(admin.ModelAdmin):
 
 class BatchAdmin(admin.ModelAdmin):
     fields = ['id', 'part', 'committee', 
-              'client_filename', 'vendor_filename', 
+              'client_filename', 'vendor_filename',
+              'original_filename', 
               'item_count', 'submission_date', 
               'processed_date', 'return_date']
 

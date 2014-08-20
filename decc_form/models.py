@@ -124,6 +124,7 @@ class Part(models.Model):
         return u'{}: {}'.format(self.id, self.state)
 
 def format_filename(instance, filename):
+    instance.original_filename = filename
     return '/'.join(['batchfiles', instance.calculate_id()+'.pdf'])
 
 class Batch(models.Model):
@@ -132,6 +133,7 @@ class Batch(models.Model):
     part = models.ForeignKey(Part) 
     committee = models.ForeignKey(Committee, null=True, blank=True)
     client_filename = models.FileField(upload_to=format_filename)
+    original_filename = models.CharField(max_length=255)
     vendor_filename = models.CharField(max_length=255)
     item_count = models.IntegerField(null=True, blank=True)
     final_item_count = models.IntegerField(null=True, blank=True)
