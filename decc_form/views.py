@@ -131,7 +131,7 @@ class BatchView(LoginRequiredMixin, TemplateView):
                     pass
                 batch = Batch(part=part, client_filename=client_filename, item_count=item_count, committee=committee)
                 batch.save()
-                return HttpResponseRedirect('/order/{0}/part/{1}/end/'.format(kwargs['order_id'], kwargs['part_id']))
+            return HttpResponseRedirect('/order/{0}/part/{1}/end/'.format(kwargs['order_id'], kwargs['part_id']))
         else:
             return self.render_to_response(context)
 
