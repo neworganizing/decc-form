@@ -123,14 +123,23 @@ class Part(models.Model):
     def __unicode__(self):
         return u'{}: {}'.format(self.id, self.state)
 
+
 def format_filename(instance, filename):
     instance.original_filename = filename
-    return '/'.join(['batchfiles', instance.calculate_id()+'.pdf'])
+
+    try:
+        batchfile_dir = settings.DECC_UPLOAD_DIR
+    except:
+        batchfile_dir = 'batchfiles'
+
+    return '/'.join([batchfile_dir, instance.calculate_id()+'.pdf'])
+
 
 class Batch(models.Model):
-    #PK = 3 digit client_id, 7 digit batch_id, based on last batch from that project
+    # PK = 3 digit client_id, 7 digit batch_id
+    # based on last batch from that project
     id = models.PositiveIntegerField(primary_key=True)
-    part = models.ForeignKey(Part) 
+    part = models.ForeignKey(Part)
     committee = models.ForeignKey(Committee, null=True, blank=True)
     client_filename = models.FileField(upload_to=format_filename)
     original_filename = models.CharField(max_length=255)
@@ -152,12 +161,12 @@ class Batch(models.Model):
     def calculate_id(self):
         proj_id = self.part.order.project.id
         c_id = str(Client.objects.get(project=proj_id).id).zfill(3)
-        
+
         try:
             b_id = str(Batch.objects.filter(id__startswith=int(c_id)).order_by('-id')[0].id + 1)[-7:] 
-        except (Batch.DoesNotExist, IndexError) as e:
+        except (Batch.DoesNotExist, IndexError):
             b_id = str(1)
-        
+
         b_id = b_id.zfill(7)
 
         return c_id + b_id
