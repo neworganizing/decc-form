@@ -4,6 +4,11 @@ from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
 
+try:
+    from django.conf import settings
+    user_model_name = settings.AUTH_USER_MODEL
+except:
+    user_model_name = u'auth.User'
 
 class Migration(SchemaMigration):
 
@@ -23,7 +28,7 @@ class Migration(SchemaMigration):
 
 
         # Changing field 'Contact.user'
-        db.alter_column(u'decc_form_contact', 'user_id', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True))
+        db.alter_column(u'decc_form_contact', 'user_id', self.gf('django.db.models.fields.related.OneToOneField')(to=orm[user_model_name], unique=True))
 
     models = {
         u'auth.group': {
